@@ -1,6 +1,6 @@
+import { Button, Drawer, Modal, IconButton } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import { useEffect } from 'react';
-import { Button, Drawer, Modal, IconButton } from 'rsuite';
 import Table from '../../components/Table';
 import moment from 'moment';
 
@@ -53,9 +53,9 @@ const Clientes = () => {
     return (
         <div className="col p-5 overflow-auto h-100">
             <Drawer 
-                show={components.drawer} 
+                open={components.drawer} 
                 size="sm"
-                onHide={() => { 
+                onClose={() => { 
                     console.log('Drawer fechado');
                     setComponent('drawer', false);
                 }}
@@ -263,13 +263,13 @@ const Clientes = () => {
                 </Drawer.Body>
             </Drawer>
             <Modal
-        show={components.confirmDelete}
-        onHide={() => setComponent('confirmDelete', false)}
+        open={components.confirmDelete}
+        onClose={() => setComponent('confirmDelete', false)}
         size="xs"
       >
         <Modal.Body>
           <IconButton
-            icon="remind"
+            icon="reminder"
             style={{
               color: '#ffb300',
               fontSize: 24,

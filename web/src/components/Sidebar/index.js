@@ -19,6 +19,18 @@ const Sidebar = () => {
                         <span>Clientes</span>
                     </Link>    
                 </li>
+                <li>
+                    <Link to="/colaboradores">
+                        <span className="mdi mdi-card-account-details-outline"></span>
+                        <span>Colaboradores</span>
+                    </Link>    
+                </li>
+                <li>
+                    <Link to="/servicos">
+                        <span className="mdi mdi-auto-fix"></span>
+                        <span>Serviços</span>
+                    </Link>    
+                </li>
             </ul>
         </div>
     );

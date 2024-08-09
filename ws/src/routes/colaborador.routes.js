@@ -156,11 +156,14 @@ router.get('/manicure/:manicureId', async (req, res) => {
         if (vinculo.colaboradorId) {
           const especialidades = await ColaboradorServico.find({
             colaboradorId: vinculo.colaboradorId._id,
-          });
+          }).populate('servicoId');
       
           listaColaboradores.push({
             ...vinculo._doc,
-            especialidades: especialidades.map((e) => e.servicoId),
+            especialidades: especialidades.map((especialidade) => ({
+              label: especialidade.servicoId.titulo,
+              value: especialidade.servicoId._id,
+            })),
           });
         }
       }
