@@ -269,9 +269,9 @@ const Clientes = () => {
       >
         <Modal.Body>
           <IconButton
-            icon="reminder"
+            icon= "Atenção"
             style={{
-              color: '#ffb300',
+              color: '#FF0000',
               fontSize: 24,
             }}
           />

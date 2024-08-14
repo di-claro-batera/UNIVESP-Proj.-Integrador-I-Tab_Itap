@@ -1,60 +1,56 @@
 import 'rsuite/dist/rsuite.min.css';
 import { useEffect } from 'react';
-import { Button, Drawer, Modal, IconButton, TagPicker } from 'rsuite';
+import { Button, Drawer, Modal, IconButton, TagPicker, Tag } from 'rsuite';
 import Table from '../../components/Table';
 import moment from 'moment';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { 
-    allColaboradores, 
-    updateColaborador,
-    filterColaboradores, 
-    addColaborador,
-    unlinkColaborador,
-    allServicos
-} from '../../store/modules/colaborador/actions';
+    allServicos, 
+    updateServico,
+    addServico,
+    removeServico,
+    } from '../../store/modules/servico/actions';
 
 
 const Servicos = () => {
 
     const dispatch = useDispatch();
-    const { colaboradores, colaborador, behavior, form, components, servicos } = useSelector(
-        (state)=> state.colaborador
-        );
+    const { servicos, servico, behavior, form, components } = useSelector(
+        (state)=> state.servico);
 
     const setComponent = (component, state) => {
         dispatch(
-            updateColaborador({
+            updateServico({
                 components: { ...components, [component]: state },
            })
         );
     };
 
-    const setColaborador = (key, value) => {
+    const setServico = (key, value) => {
         dispatch(
-            updateColaborador({
-                colaborador: { ...colaborador, [key]: value },
+            updateServico({
+                servico: { ...servico, [key]: value },
             })
         );
     };
 
     const save = () => {
-        dispatch(addColaborador());
+        dispatch(addServico());
     };
 
     const remove = () => {
-        dispatch(unlinkColaborador());
+        dispatch(removeServico());
     };
 
     useEffect(() => {
-        dispatch(allColaboradores());
         dispatch(allServicos());
         console.log('Estado atual do drawer:', components.drawer);
     }, [dispatch, components.drawer])
 
     return (
         <div className="col p-5 overflow-auto h-100">
-            <Drawer 
+            {/*<Drawer 
                 open={components.drawer} 
                 size="sm"
                 onClose={() => { 
@@ -74,7 +70,7 @@ const Servicos = () => {
                                 className="form-control"
                                 placeholder="E-mail do Colaborador"
                                 value={colaborador.email}
-                                onChange={ (e) => setColaborador('email', e.target.value)}
+                                onChange={ (e) => setServico('email', e.target.value)}
                                 />
                                 {behavior === 'create' && (
                                     <div class="input-group-append">
@@ -84,7 +80,7 @@ const Servicos = () => {
                                         disabled={form.filtering}
                                         onClick={() => {
                                             dispatch(
-                                                filterColaboradores());
+                                                filterservicos());
                                         }}
                                         >
                                             Pesquisar
@@ -101,7 +97,7 @@ const Servicos = () => {
                         placeholder="Nome do Colaborador"
                         disabled={form.disabled}
                         value={colaborador.nome}
-                        onChange={(e) => setColaborador('nome', e.target.value)}
+                        onChange={(e) => setServico('nome', e.target.value)}
                         />
                     </div>
                     <div className="form-group col-6">
@@ -110,7 +106,7 @@ const Servicos = () => {
                         className="form-control"
                         disabled={form.disabled && behavior === 'create'}
                         value={colaborador.vinculo}
-                        onChange={(e) => setColaborador('vinculo', e.target.value)}
+                        onChange={(e) => setServico('vinculo', e.target.value)}
                         >
                             <option value="A">Ativo</option>
                             <option value="I">Inativo</option>
@@ -124,7 +120,7 @@ const Servicos = () => {
                         placeholder="Telefone / Whatsapp do Cliente"
                         disabled={form.disabled}
                         value={colaborador.telefone}
-                        onChange={(e) => setColaborador('telefone', e.target.value)}
+                        onChange={(e) => setServico('telefone', e.target.value)}
                         />
                     </div>
                     <div className="form-group col-4">
@@ -135,7 +131,7 @@ const Servicos = () => {
                         placeholder="Data de Nascimento do Cliente"
                         disabled={form.disabled}
                         value={colaborador.dataNascimento}
-                        onChange={(e) => setColaborador('dataNascimento', e.target.value)}
+                        onChange={(e) => setServico('dataNascimento', e.target.value)}
                         />
                     </div>
                     <div className="form-group col-4">
@@ -143,7 +139,7 @@ const Servicos = () => {
                         <select className="form-control"
                         disabled={form.disabled}
                         value={colaborador.sexo}
-                        onChange={(e) => setColaborador('sexo',e.target.value)}
+                        onChange={(e) => setServico('sexo',e.target.value)}
                         >
                         <option value="M">Masculino</option>
                         <option value="F">Feminino</option>
@@ -157,7 +153,7 @@ const Servicos = () => {
                         data={servicos} 
                         disabled={form.disabled && behavior === "create"}
                         value={colaborador.especialidades}
-                        onChange={(especialidade) => setColaborador('especialidades', especialidade)
+                        onChange={(especialidade) => setServico('especialidades', especialidade)
                     }
                         />
                     </div>
@@ -185,7 +181,7 @@ const Servicos = () => {
             </Button>
           )}
                 </Drawer.Body>
-            </Drawer>
+          </Drawer>*/}
             <Modal
         open={components.confirmDelete}
         onClose={() => setComponent('confirmDelete', false)}
@@ -193,9 +189,9 @@ const Servicos = () => {
       >
         <Modal.Body>
           <IconButton
-            icon="remind"
+            icon="Atenção"
             style={{
-              color: '#ffb300',
+              color: '#FF0000',
               fontSize: 24,
             }}
           />
@@ -224,47 +220,71 @@ const Servicos = () => {
                             onClick={() => {
                                 console.log('Botão clicado');
                                 dispatch(
-                                    updateColaborador({
+                                    updateServico({
                                         behavior: 'create',
                                     })
                                 );
                                 setComponent('drawer', true);
                             }}
                             >
-                            <span className="mdi mdi-plus">Novo Colaborador</span>
+                            <span className="mdi mdi-plus">Novo Serviço</span>
                             </button> 
                         </div>
                     </div>
                     <Table
                     loading={form.filtering}
-                    data={colaboradores} 
+                    data={servicos} 
                     config={[
-                        {label: 'Nome', key: 'nome', width:150 },
-                        {label: 'Email', key: 'email', width:150 },
-                        {label: 'Telefone', key: 'telefone', width:150 },
-                        {label: 'Data Cadastro', 
-                        content: (colaborador) => 
-                            moment(colaborador.dataCadastro).format('DD/MM/YYYY'), 
-                        width:150 },
-                        {label: 'Data Nascimento',
-                        content: (colaborador) => 
-                            moment(colaborador.dataNascimento).format('DD/MM/YYYY'),
-                        width:150 },
+                        {
+                            label: 'Titulo',
+                            key: 'titulo',
+                            sortable: true,
+                            fixed: true,
+                            width: 200,
+                        },
+                        {
+                            label: 'R$ Preço',
+                            content: (servico) => `R$ ${servico.preco.toFixed(2)}`,
+                        },
+                        {
+                            label: '% Comissão',
+                            content: (servico) => `${servico.comissao}%`,
+                        },
+                        {
+                            label: 'Recorrência (dias)',
+                            content: (servico) => `${servico.comissao} dias`,
+                        },
+                        {
+                            label: 'Duração',
+                            key: 'duracao',
+                            sortable: true,
+                            content: (servico) => moment(servico.duracao).format('HH:mm'),
+                        },
+                        {
+                            label: 'Status',
+                            key: 'status',
+                            content: (servico) => (
+                                <Tag color={servico.status === 'A' ? 'green' : 'red'}>
+                                    {servico.status === 'A' ? 'Ativo' : 'Inativo'}
+                                </Tag>
+                            ),
+                            sortable: true,
+                        },
                     ]}
-                    actions={(colaborador) => (
+                    actions={(servico) => (
                         <Button color="red" size="xs">
                             + Info
                         </Button>
                     )}
-                    onRowClick={(colaborador) =>{
+                    onRowClick={(servico) =>{
                         dispatch(
-                            updateColaborador({
+                            updateServico({
                                 behavior: 'update',
                             })
                         );
                         dispatch(
-                            updateColaborador({
-                                colaborador,
+                            updateServico({
+                                servico,
                             })
                         );
                         setComponent('drawer', true);

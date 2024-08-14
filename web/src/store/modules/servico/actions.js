@@ -14,7 +14,7 @@ export function addServico() {
     return { type:types.ADD_SERVICO };
 }
 
-export function resetServicoes() {
+export function resetServico() {
     return { type:types.RESET_SERVICO };
 }
 

@@ -193,9 +193,9 @@ const Colaboradores = () => {
       >
         <Modal.Body>
           <IconButton
-            icon="remind"
+            icon="Atenção"
             style={{
-              color: '#ffb300',
+              color: '#FF0000',
               fontSize: 24,
             }}
           />
