@@ -10,6 +10,8 @@ Daiane Priscila Martins Januário
 
 Diego Claro de Moraes
 
+Gustavo de Menezes Nordi
+
 Paulo Rogério Pereira
 
 Reginaldo Henrique Bueno
