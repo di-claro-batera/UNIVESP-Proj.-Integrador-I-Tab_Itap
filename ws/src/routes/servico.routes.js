@@ -6,9 +6,6 @@ const Servico = require('../models/servico');
 const Arquivos = require('../models/arquivo');
 const moment = require('moment');
 
-/*
-  FAZER NA #01
-*/
 router.post('/', async (req, res) => {
   try {
     const { manicureId, servico } = req.body;
@@ -18,14 +15,11 @@ router.post('/', async (req, res) => {
     if (req.files && Object.keys(req.files).length > 0) {
       for (let key of Object.keys(req.files)) {
         const file = req.files[key];
-        
         const nameParts = file.name.split('.');
-        const fileName = `${new Date().getTime()}.${
-          nameParts[nameParts.length - 1]
-        }`;    
+        const fileName = `${new Date().getTime()}.${nameParts[nameParts.length - 1]}`;
         const path = `servicos/${manicureId}/${fileName}`;
-        const response = await aws.uploadToS3(file,path);
-        
+        const response = await aws.uploadToS3(file, path);
+
         if (response.error) {
           errors.push({ error: true, message: response.message.message });
         } else {
@@ -33,50 +27,51 @@ router.post('/', async (req, res) => {
         }
       }
     }
-    
+
     if (errors.length > 0) {
       res.json(errors[0]);
       return false;
     }
 
-            // CRIAR SERVIÇO
     let jsonServico = JSON.parse(servico);
-    //jsonServico.manicureId = req.body.manicureId;
+
+    // Calcular o horário de fim com base no horário de início e na duração
+    const inicioDate = new Date(jsonServico.inicio);
+    const fimDate = new Date(inicioDate.getTime() + jsonServico.duracao * 60000); // Adiciona a duração em minutos
+
+    jsonServico.inicio = inicioDate;
+    jsonServico.fim = fimDate;
+
     const servicoCadastrado = await Servico(jsonServico).save();
 
-            // CRIAR ARQUIVO
     arquivos = arquivos.map((arquivo) => ({
       referenciaId: servicoCadastrado._id,
       model: 'Servico',
       caminho: arquivo,
     }));
     await Arquivos.insertMany(arquivos);
-    
+
     res.json({ servico: servicoCadastrado, arquivos });
   } catch (err) {
     return res.json({ error: true, message: err.message });
   }
-  
-  //return req.json({ error: false, message: "Sucesso" });
 });
+
 
 router.put('/:id', async (req, res) => {
   try {
-    const { manicureId, servico } = req.body;
+    const { servico } = req.body;
     let errors = [];
     let arquivos = [];
 
     if (req.files && Object.keys(req.files).length > 0) {
       for (let key of Object.keys(req.files)) {
         const file = req.files[key];
-        
         const nameParts = file.name.split('.');
-        const fileName = `${new Date().getTime()}.${
-          nameParts[nameParts.length - 1]
-        }`;    
+        const fileName = `${new Date().getTime()}.${nameParts[nameParts.length - 1]}`;
         const path = `servicos/${req.body.manicureId}/${fileName}`;
-        const response = await aws.uploadToS3(file,path);
-        
+        const response = await aws.uploadToS3(file, path);
+
         if (response.error) {
           errors.push({ error: true, message: response.message.message });
         } else {
@@ -84,31 +79,28 @@ router.put('/:id', async (req, res) => {
         }
       }
     }
-    
+
     if (errors.length > 0) {
       res.json(errors[0]);
       return false;
     }
 
-            // CRIAR SERVIÇO
-    const jsonServico = JSON.parse(servico)
+    const jsonServico = JSON.parse(servico);
     await Servico.findByIdAndUpdate(req.params.id, jsonServico);
 
-            // CRIAR ARQUIVO
     arquivos = arquivos.map((arquivo) => ({
       referenciaId: req.params.id,
       model: 'Servico',
       caminho: arquivo,
     }));
     await Arquivos.insertMany(arquivos);
-    
+
     res.json({ error: false });
   } catch (err) {
     return res.json({ error: true, message: err.message });
   }
-  
-  //return req.json({ error: false, message: "Sucesso" });
 });
+
 
 router.get('/manicure/:manicureId', async (req, res) =>{
   try{
@@ -136,12 +128,12 @@ router.get('/manicure/:manicureId', async (req, res) =>{
 
 router.post('/delete-arquivo', async (req, res) => {
   try {
-    const { id } = req.body;
+    const { key } = req.params;
 
-    await aws.deleteFileS3(id);
+    await aws.deleteFileS3(key);
 
     await Arquivos.findOneAndDelete({
-      caminho: id,
+      caminho: key,
     });
 
     res.json({ error: false });

@@ -31,6 +31,12 @@ const Sidebar = () => {
                         <span>Serviços</span>
                     </Link>    
                 </li>
+                <li>
+                    <Link to="/horarios">
+                        <span className="mdi mdi-clock-check-outline"></span>
+                        <span>Horários</span>
+                    </Link>    
+                </li>
             </ul>
         </div>
     );

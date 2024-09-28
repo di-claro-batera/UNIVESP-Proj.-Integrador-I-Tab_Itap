@@ -1,8 +1,11 @@
 import 'rsuite/dist/rsuite.min.css';
 import { useEffect } from 'react';
-import { Button, Drawer, Modal, IconButton, TagPicker, Tag } from 'rsuite';
+import { Button, Drawer, Modal, IconButton, DatePicker, Uploader, Tag } from 'rsuite';
+import { Image } from '@rsuite/icons';
 import Table from '../../components/Table';
 import moment from 'moment';
+import consts from '../../consts';
+import RemindFillIcon from '@rsuite/icons/RemindFill';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -10,7 +13,10 @@ import {
     updateServico,
     addServico,
     removeServico,
+    removeArquivo,
+    resetServico,
     } from '../../store/modules/servico/actions';
+
 
 
 const Servicos = () => {
@@ -50,7 +56,7 @@ const Servicos = () => {
 
     return (
         <div className="col p-5 overflow-auto h-100">
-            {/*<Drawer 
+            <Drawer 
                 open={components.drawer} 
                 size="sm"
                 onClose={() => { 
@@ -59,106 +65,117 @@ const Servicos = () => {
                 }}
             >
                 <Drawer.Body>
-                    <h3>{behavior === 'create' ? 'Criar Novo' : 'Atualizar'} Colaborador</h3>
+                    <h3>{behavior === 'create' ? 'Criar Novo' : 'Atualizar'} Servico</h3>
                     <div className="row mt-3">
-                        <div className="form-group col-12">
-                            <b className="">E-mail</b>
-                            <div class="input-group mb-3">
-                                <input
-                                disabled={behavior === 'update'}
-                                type="email"
-                                className="form-control"
-                                placeholder="E-mail do Colaborador"
-                                value={colaborador.email}
-                                onChange={ (e) => setServico('email', e.target.value)}
-                                />
-                                {behavior === 'create' && (
-                                    <div class="input-group-append">
-                                        <Button
-                                        appearance="primary"
-                                        loading={form.filtering}
-                                        disabled={form.filtering}
-                                        onClick={() => {
-                                            dispatch(
-                                                filterservicos());
-                                        }}
-                                        >
-                                            Pesquisar
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    <div className="form-group col-6">
-                        <b className="">Nome</b>
-                        <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Nome do Colaborador"
-                        disabled={form.disabled}
-                        value={colaborador.nome}
-                        onChange={(e) => setServico('nome', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group col-6">
-                        <b className="">Status</b>
-                        <select
-                        className="form-control"
-                        disabled={form.disabled && behavior === 'create'}
-                        value={colaborador.vinculo}
-                        onChange={(e) => setServico('vinculo', e.target.value)}
-                        >
-                            <option value="A">Ativo</option>
-                            <option value="I">Inativo</option>
-                        </select>
-                    </div>
-                    <div className="form-group col-4">
-                        <b className="">Telefone / Whatssapp</b>
-                        <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Telefone / Whatsapp do Cliente"
-                        disabled={form.disabled}
-                        value={colaborador.telefone}
-                        onChange={(e) => setServico('telefone', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group col-4">
-                        <b className="">Data de Nascimento</b>
-                        <input
-                        type="date"
-                        className="form-control"
-                        placeholder="Data de Nascimento do Cliente"
-                        disabled={form.disabled}
-                        value={colaborador.dataNascimento}
-                        onChange={(e) => setServico('dataNascimento', e.target.value)}
-                        />
-                    </div>
-                    <div className="form-group col-4">
-                        <b className="">Sexo</b>
-                        <select className="form-control"
-                        disabled={form.disabled}
-                        value={colaborador.sexo}
-                        onChange={(e) => setServico('sexo',e.target.value)}
-                        >
-                        <option value="M">Masculino</option>
-                        <option value="F">Feminino</option>
-                        </select>
-                    </div>
+            <div className="form-group col-6">
+              <b className="">Título</b>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Titulo do serviço"
+                value={servico.titulo}
+                onChange={(e) => {
+                  setServico('titulo', e.target.value);
+                }}
+              />
+            </div>
+            <div className="form-group col-3">
+              <b className="">R$ Preço</b>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="Preço do serviço"
+                value={servico.preco}
+                onChange={(e) => setServico('preco', e.target.value)}
+              />
+            </div>
+            <div className="form-group col-3">
+              <b className="">Recorr. (dias)</b>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="Recorrência do serviço"
+                value={servico.recorrencia}
+                onChange={(e) => setServico('recorrencia', e.target.value)}
+              />
+            </div>
+            <div className="form-group col-4">
+              <b className="">% Comissão</b>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="Comissão do serviço"
+                value={servico.comissao}
+                onChange={(e) => setServico('comissao', e.target.value)}
+              />
+            </div>
+            <div className="form-group col-4">
+            <b className="d-block">Duração</b>
+            <DatePicker
+                block
+                format="HH:mm"
+                value={servico.duracao ? new Date(servico.duracao) : null}
+                hideMinutes={(min) => ![0, 30].includes(min)}
+                onChange={(e) => {
+                console.log('Valor retornado pelo DatePicker:', e);
+                setServico('duracao', e instanceof Date ? e : new Date(e));
+                }}
+            />
+            </div>
+            <div className="form-group col-4">
+              <b>Status</b>
+              <select
+                className="form-control"
+                value={servico.status}
+                onChange={(e) => setServico('status', e.target.value)}
+              >
+                <option value="A">Ativo</option>
+                <option value="I">Inativo</option>
+              </select>
+            </div>
 
-                    <div className="col-12">
-                        <b>Especialidades</b>
-                        <TagPicker size="lg"
-                        block 
-                        data={servicos} 
-                        disabled={form.disabled && behavior === "create"}
-                        value={colaborador.especialidades}
-                        onChange={(especialidade) => setServico('especialidades', especialidade)
-                    }
-                        />
-                    </div>
-                </div>
-                <Button
+            <div className="form-group col-12">
+              <b>Descrição</b>
+              <textarea
+                rows="5"
+                className="form-control"
+                placeholder="Descrição do serviço..."
+                value={servico.descricao}
+                onChange={(e) => setServico('descricao', e.target.value)}
+              ></textarea>
+            </div>
+
+            <div className="form-group col-12">
+              <b className="d-block">Imagens do serviço</b>
+              <Uploader
+                multiple
+                autoUpload={false}
+                listType="picture"
+                defaultFileList={servico.arquivos.map((servico, index) => ({
+                  name: servico?.caminho,
+                  fileKey: index,
+                  url: `${consts.bucketUrl}/${servico?.caminho}`,
+                }))}
+                onChange={(files) => {
+                  const arquivos = files
+                    .filter((f) => f.blobFile)
+                    .map((f) => f.blobFile);
+
+                  setServico('arquivos', arquivos);
+                }}
+                onRemove={(file) => {
+                  if (behavior === 'update' && file.url) {
+                    dispatch(removeArquivo(file.name));
+                  }
+                }}
+              >
+                <button>
+                <IconButton icon={<Image/>} size="lg" />
+                </button>
+              </Uploader>
+            </div>
+          </div>
+          <Button
             loading={form.saving}
             color={behavior === 'create' ? 'green' : 'primary'}
             size="lg"
@@ -166,7 +183,7 @@ const Servicos = () => {
             onClick={() => save()}
             className="mt-3"
           >
-            {behavior === 'create' ? "Salvar" : "Atualizar"} Colaborador
+            {behavior === 'create' ? 'Salvar' : 'Atualizar'} Serviço
           </Button>
           {behavior === 'update' && (
             <Button
@@ -177,11 +194,11 @@ const Servicos = () => {
               onClick={() => setComponent('confirmDelete', true)}
               className="mt-1"
             >
-              Remover Colaborador
+              Remover Serviço
             </Button>
           )}
                 </Drawer.Body>
-          </Drawer>*/}
+          </Drawer>
             <Modal
         open={components.confirmDelete}
         onClose={() => setComponent('confirmDelete', false)}
@@ -189,7 +206,7 @@ const Servicos = () => {
       >
         <Modal.Body>
           <IconButton
-            icon="Atenção"
+            icon={<RemindFillIcon/>}
             style={{
               color: '#FF0000',
               fontSize: 24,
@@ -218,7 +235,7 @@ const Servicos = () => {
                             <button 
                             className="btn btn-primary btn-lg"
                             onClick={() => {
-                                console.log('Botão clicado');
+                                dispatch(resetServico());
                                 dispatch(
                                     updateServico({
                                         behavior: 'create',
@@ -252,7 +269,7 @@ const Servicos = () => {
                         },
                         {
                             label: 'Recorrência (dias)',
-                            content: (servico) => `${servico.comissao} dias`,
+                            content: (servico) => `${servico.recorrencia} dias`,
                         },
                         {
                             label: 'Duração',

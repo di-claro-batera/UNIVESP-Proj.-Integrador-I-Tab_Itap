@@ -12,5 +12,5 @@ let options = {};
 
 mongoose
   .connect(URI, options)
-  .then(() => console.log('DB is Up!'))
+  .then(() => console.log('DataBase Rodando!'))
   .catch((err) => console.log(err));

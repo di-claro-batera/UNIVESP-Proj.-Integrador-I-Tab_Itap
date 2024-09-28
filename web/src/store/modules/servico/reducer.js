@@ -5,26 +5,26 @@ import moment from 'moment';
 const INITIAL_STATE = {
     behavior: 'create',
     components: {
-        drawer: false,
-        confirmDelete: false
+      drawer: false,
+      confirmDelete: false
     },
     form: {
-        filtering: false,
-        disabled: true,
-        saving: false,
+      filtering: false,
+      disabled: true,
+      saving: false,
     },
     servicos: [],
     servico: {
-        titulo: '',
-        preco: '',
-        comissao: '',
-        duracao: moment('00:30', 'HH:mm').format(),
-        recorrencia: '',
-        descricao: '',
-        status: 'A',
-        arquivos: [],
+      titulo: '',
+      preco: '',
+      comissao: '',
+      duracao: moment('00:30', 'HH:mm').format(),
+      recorrencia: '',
+      descricao: '',
+      status: 'A',
+      arquivos: [],
     },
-};
+  };
 
 function servico(state = INITIAL_STATE, action) {
     switch(action.type) {

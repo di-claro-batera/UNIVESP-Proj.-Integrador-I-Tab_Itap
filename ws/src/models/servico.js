@@ -17,15 +17,15 @@ const servico = new Schema({
   },
   comissao: {
     type: Number,
-    required: true,
+    required: false,
   },
   duracao: {
-    type: Number,
+    type: Date,
     required: true,
   },
   recorrencia: {
     type: Number,
-    required: true,
+    required: false,
     default: 30,
   },
   descricao: {

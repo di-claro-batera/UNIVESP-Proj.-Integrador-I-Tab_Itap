@@ -44,6 +44,8 @@ router.put('/:horarioId', async (req, res) => {
 
 router.post('/colaboradores', async (req, res) => {
   try {
+    console.log('Especialidades recebidas:', req.body.especialidades);
+
     const colaboradorServico = await ColaboradorServico.find({
       servicoId: { $in: req.body.especialidades },
       status: 'A',
@@ -51,14 +53,23 @@ router.post('/colaboradores', async (req, res) => {
       .populate('colaboradorId', 'nome')
       .select('colaboradorId -_id');
 
-    const listaColaboradores = _.uniqBy(colaboradorServico, (vinculo) => vinculo.colaboradorId._id.toString()).map((vinculo) => ({
-        label: vinculo.colaboradorId.nome, 
-        value: vinculo.colaboradorId._id,
+    console.log('Colaboradores encontrados:', colaboradorServico);
+
+
+    const listaColaboradores = _.uniqBy(
+      colaboradorServico.filter(vinculo => vinculo.colaboradorId !== null), 
+      (vinculo) => vinculo.colaboradorId._id.toString()
+    ).map((vinculo) => ({
+      label: vinculo.colaboradorId.nome, 
+      value: vinculo.colaboradorId._id,
     }));
+
+    console.log('Lista de Colaboradores:', listaColaboradores);
 
     res.json({ error: false, colaboradores: listaColaboradores });
   } catch (err) {
-    res.json({ error: true, message: err.message });
+    console.error('Erro ao buscar colaboradores:', err);
+    res.status(500).json({ error: true, message: err.message });
   }
 });
 

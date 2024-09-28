@@ -3,6 +3,7 @@ import 'rsuite/dist/rsuite.min.css';
 import { useEffect } from 'react';
 import Table from '../../components/Table';
 import moment from 'moment';
+import RemindFillIcon from '@rsuite/icons/RemindFill';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -268,8 +269,8 @@ const Clientes = () => {
         size="xs"
       >
         <Modal.Body>
-          <IconButton
-            icon= "Atenção"
+        <IconButton
+            icon={<RemindFillIcon/>}
             style={{
               color: '#FF0000',
               fontSize: 24,

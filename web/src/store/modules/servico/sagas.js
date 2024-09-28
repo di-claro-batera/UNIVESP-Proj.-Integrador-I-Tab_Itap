@@ -35,28 +35,27 @@ export function* allServicos () {
 
 export function* addServico() {
 
-    const { form, colaborador, components, behavior } = yield select(state => state.colaborador);
+    const { form, servico, components, behavior } = yield select(state => state.servico);
 
     try {
         yield put(updateServico({ form: {...form, saving:true} }));
-        let res = {};
 
-        if (behavior === "create") {
-            const response = yield call(api.post, `/colaborador`, {
-                manicureId: consts.manicureId,
-                colaborador
-            });
-            res = response.data;
-        } else {
-            const response = yield call(api.put, `/colaborador/${colaborador._id}`, {
-                vinculo: colaborador.vinculo,
-                vinculoId: colaborador.vinculoId,
-                especialidades: colaborador.especialidades,
-            });
-            res = response.data;
-        }
 
-            yield put(updateServico({ form: {...form, saving:false} }));
+        const formData = new FormData();
+        formData.append('servico', JSON.stringify({ ...servico, manicureId:consts.manicureId})
+        );
+        formData.append('manicureId', consts.manicureId);
+        servico.arquivos.map((a, i) => {
+            formData.append(`arquivo_${i}`, a);
+        });
+
+        const {data: res} = yield call(
+            api[behavior === "create" ? "post" : "put"], 
+            behavior === "create" ? `/servico` : `/servico/${servico._id}`, 
+            formData
+        );
+
+        yield put(updateServico({ form: {...form, saving:false} }));
 
         if (res.error) {
             alert(res.message);
@@ -76,13 +75,14 @@ export function* addServico() {
 
 export function* removeServico() {
 
-    const { form, colaborador, components } = yield select(state => state.colaborador);
+    const { form, servico, components } = yield select(state => state.servico);
 
     try {
         yield put(updateServico({ form: {...form, saving:true} }));
 
-        const { data: res } = yield call(api.delete, 
-            `/colaborador/vinculo/${colaborador.vinculoId}`
+        const { data: res } = yield call(
+            api.delete, 
+            `/servico/${servico._id}`
         );
 
             yield put(updateServico({ 
@@ -106,7 +106,33 @@ export function* removeServico() {
     }
 }
 
-export function* removeArquivo() {}
+export function* removeArquivo( key ) {
+    const { form } = yield select(state => state.servico);
+
+    try {
+        yield put(updateServico({ form: {...form, saving:true} }));
+
+        const { data: res } = yield call(api.post, `/servico/delete-arquivo/`, {
+                key,
+            });
+
+            yield put(updateServico({ 
+                form: {...form, saving:false },
+                })
+            );
+
+        if (res.error) {
+            alert(res.message);
+            return false;
+        }  
+        
+
+
+    } catch(err) {
+        yield put(updateServico({ form: {...form, saving:false} }));
+        alert(err.message);
+    }
+}
 
 export default all([
     takeLatest(types.ALL_SERVICOS, allServicos),
