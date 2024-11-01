@@ -1,0 +1,29 @@
+{
+    "colors": {
+        "primary": "#460070",
+        "light": "#f5f6f7",
+        "sucess": "#25D84C",
+        "danger": "#d62828",
+        "dark": "#21232f",
+        "muted": "#5E6171",
+        "transparent": "rgba(255, 255, 255, 0.0)" 
+    },
+    "fonts": {
+        "regular": {
+            "fontFamily": "Pattaya-Regular",
+            "fontWeight": "normal"
+        },
+        "medium": {
+            "fontFamily": "PoiretOne-Regular",
+            "fontWeight": "normal"
+        },
+        "light": {
+            "fontFamily": "PragatiNarrow-Regular",
+            "fontWeight": "normal"
+        },
+        "bold": {
+            "fontFamily": "PragatiNarrow-Bold",
+            "fontWeight": "normal"
+        }
+    }
+}
