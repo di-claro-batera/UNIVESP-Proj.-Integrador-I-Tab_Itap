@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * A modified version of the default AnimatedEasing.exp,
  * to insure its value never goes below `0`.

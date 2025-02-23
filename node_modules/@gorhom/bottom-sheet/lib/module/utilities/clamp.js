@@ -1,3 +1,5 @@
+"use strict";
+
 export const clamp = (value, lowerBound, upperBound) => {
   'worklet';
 

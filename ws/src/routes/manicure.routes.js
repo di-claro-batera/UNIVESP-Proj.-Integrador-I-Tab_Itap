@@ -60,9 +60,9 @@ router.get('/:id', async (req, res) => {
       manicureId: req.params.id,
     }).select('dias inicio fim');
 
-    //const isOpened = await util.isOpened(horarios);
+    const isOpened = await util.isOpened(horarios);
 
-    res.json({ error: false, manicure: { ...manicure._doc, /*isOpened*/ } });
+    res.json({ error: false, manicure: { ...manicure._doc, isOpened } });
   } catch (err) {
     res.json({ error: true, message: err.message });
   }

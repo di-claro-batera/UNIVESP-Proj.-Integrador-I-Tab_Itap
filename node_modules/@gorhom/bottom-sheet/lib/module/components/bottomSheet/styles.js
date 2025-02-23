@@ -1,3 +1,5 @@
+"use strict";
+
 import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
@@ -7,7 +9,9 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0
   },
-  contentContainer: {},
+  contentContainer: {
+    overflow: 'visible'
+  },
   contentMaskContainer: {
     overflow: 'hidden'
   }

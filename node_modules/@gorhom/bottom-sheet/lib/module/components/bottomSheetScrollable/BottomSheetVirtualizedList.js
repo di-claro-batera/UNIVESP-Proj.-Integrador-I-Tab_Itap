@@ -1,3 +1,5 @@
+"use strict";
+
 import { memo } from 'react';
 import { VirtualizedList as RNVirtualizedList } from 'react-native';
 import Animated from 'react-native-reanimated';

@@ -40,43 +40,43 @@ const colaborador = new Schema({
   contaBancaria: {
     titular: {
       type: String,
-      required: true,
+      required: false,
     },
     cpfCnpj: {
       type: String,
-      required: true,
+      required: false,
     },
     banco: {
       type: String,
-      required: true,
+      required: false,
     },
     tipo: {
       type: String,
       enum: ['conta_corrente', 'conta_poupanca', 'conta_corrente_conjunta', 'conta_poupanca_conjunta'],
-      required: true,
+      required: false,
     },
     agencia: {
       type: String,
-      required: true,
+      required: false,
     },
     numero: {
       type: String,
-      required: true,
+      required: false,
     },
     dv: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   
   recipientId: {
     type: String,
-    required: true,
+    required: false,
   },
 
   especialidades: {
-    type: String, // ou qualquer outro tipo que você espera que as especialidades sejam
-    required: true, // ou false, dependendo se cada colaborador deve ter especialidades
+    type: [String], // ou qualquer outro tipo que você espera que as especialidades sejam
+    required: false, // ou false, dependendo se cada colaborador deve ter especialidades
   },
   
   dataCadastro: {

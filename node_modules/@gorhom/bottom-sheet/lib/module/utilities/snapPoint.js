@@ -1,3 +1,5 @@
+"use strict";
+
 export const snapPoint = (value, velocity, points) => {
   'worklet';
 

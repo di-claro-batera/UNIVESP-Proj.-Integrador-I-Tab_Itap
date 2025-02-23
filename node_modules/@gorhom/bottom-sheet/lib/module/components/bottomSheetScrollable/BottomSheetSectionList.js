@@ -1,3 +1,5 @@
+"use strict";
+
 import { memo } from 'react';
 import { SectionList as RNSectionList } from 'react-native';
 import Animated from 'react-native-reanimated';

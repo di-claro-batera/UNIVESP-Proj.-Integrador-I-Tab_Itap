@@ -3,9 +3,9 @@ import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { FontSizeProvider, useFontSize } from './FontSizeContext'; // Importando FontSizeProvider e useFontSize
+import { FontSizeProvider, useFontSize } from './FontSizeContext';
 import ModalHeader from './header';
-import Resume from './resume';
+import Resume from './resume'; // Importando o Resume corretamente
 import theme from '../../styles/theme.json';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,12 +14,34 @@ import EspecialistaPicker from './Especialistas';
 import EspecialistaModal from './Especialistas/modal';
 import PaymentPicker from './payment';
 import { Box } from '../../styles';
+import { useSelector } from 'react-redux';
 
-const ModalAgendamentoContent = () => {
+const ModalAgendamento = () => {
+    const { form, agendamento, servicos, agenda } = useSelector(state => state.manicure);
     const sheetRef = useRef(null);
-    const [paddingTop, setPaddingTop] = useState(100);
+
+    // Encontra o serviço selecionado
+    const servico = servicos.find((s) => s._id === agendamento.servicoId); // Use _id aqui
+
+    // Verifica se o serviço foi encontrado
+    const servicoValido = servico ? servico : null;
+
+    // Função para abrir a modal
+    const openModal = useCallback(() => {
+        if (sheetRef.current) {
+            sheetRef.current.snapToIndex(1); // Abre a modal no índice 1
+        }
+    }, []);
+
+    // Função para fechar a modal
+    const closeModal = useCallback(() => {
+        if (sheetRef.current) {
+            sheetRef.current.snapToIndex(0); // Fecha a modal (volta ao índice 0)
+        }
+    }, []);
+
     const [isExpanded, setIsExpanded] = useState(false);
-    const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize(); // Usando o contexto de tamanho de fonte
+    const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize();
     const snapPoints = useMemo(() => ['100%', '99%'], []);
 
     const handleSheetChange = useCallback((index) => {
@@ -27,28 +49,18 @@ const ModalAgendamentoContent = () => {
         setIsExpanded(index === 1);
     }, []);
 
-    const handleSnapTo95 = useCallback(() => {
-        setPaddingTop(800);
-        sheetRef.current?.snapToIndex(1);
-    }, []);
-
-    const handleCloseSheet = useCallback(() => {
-        setPaddingTop(100);
-        sheetRef.current?.snapToIndex(0);
-    }, []);
-
     return (
         <GestureHandlerRootView style={[styles.container, { paddingTop: isExpanded ? 810 : 100 }]}>
             <BottomSheet
                 ref={sheetRef}
-                index={0}
+                index={0} // Índice inicial fechado
                 snapPoints={snapPoints}
                 onChange={handleSheetChange}
                 enablePanDownToClose={false}
                 backgroundStyle={styles.bottomSheetBackground}
             >
                 <BottomSheetView style={styles.contentContainer}>
-                    <TouchableOpacity onPress={isExpanded ? handleCloseSheet : handleSnapTo95} style={styles.touchable}>
+                    <TouchableOpacity onPress={isExpanded ? closeModal : openModal} style={styles.touchable}>
                         <View style={styles.headerContainer}>
                             <LinearGradient
                                 colors={['#6750A4', '#B45BD9']}
@@ -65,8 +77,16 @@ const ModalAgendamentoContent = () => {
                         </View>
                     </TouchableOpacity>
                     <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent}>
-                        <Resume />
-                        <DateTime />
+                        {servicoValido ? (
+                            <Resume servico={servicoValido} />
+                        ) : (
+                            <Box align="center" hasPadding>
+                                <Text style={{ fontSize: 16 * fontScale, fontFamily: theme.fonts.regular.fontFamily }}>
+                                    Nenhum serviço selecionado.
+                                </Text>
+                            </Box>
+                        )}
+                        <DateTime servico={servicoValido} servicos={servicos} agendamento={agendamento} agenda={agenda} />
                         <EspecialistaPicker />
                         <PaymentPicker />
                         <Box hasPadding>
@@ -74,7 +94,10 @@ const ModalAgendamentoContent = () => {
                                 colors={['#6750A4', '#B45BD9']}
                                 style={styles.gradientButton}
                             >
-                                <TouchableOpacity style={styles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={styles.buttonContainer}
+                                    onPress={openModal}
+                                >
                                     <Icon name="check" color={theme.colors.light} size={32} />
                                     <Text style={styles.confirmButtonText}>Confirmar Meu Agendamento</Text>
                                 </TouchableOpacity>
@@ -105,12 +128,6 @@ const ModalAgendamentoContent = () => {
         </GestureHandlerRootView>
     );
 };
-
-const ModalAgendamento = () => (
-    <FontSizeProvider>
-        <ModalAgendamentoContent />
-    </FontSizeProvider>
-);
 
 const styles = StyleSheet.create({
     container: {
@@ -190,7 +207,7 @@ const styles = StyleSheet.create({
     circleButton: {
         width: 30,
         height: 30,
-        borderRadius: 1, // Para garantir que seja um círculo
+        borderRadius: 15, // Corrigido para garantir que seja um círculo
         backgroundColor: theme.colors.primary,
         alignItems: 'center',
         justifyContent: 'center',

@@ -12,6 +12,8 @@
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.0.5",
     "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-native-community/datetimepicker": "^8.3.0",
+    "axios": "^1.7.9",
     "deprecated-react-native-prop-types": "^5.0.0",
     "immer": "^10.1.1",
     "link": "^2.1.1",

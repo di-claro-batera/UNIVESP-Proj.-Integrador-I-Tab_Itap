@@ -1,3 +1,5 @@
+"use strict";
+
 import { memo } from 'react';
 import { FlatList as RNFlatList } from 'react-native';
 import Animated from 'react-native-reanimated';

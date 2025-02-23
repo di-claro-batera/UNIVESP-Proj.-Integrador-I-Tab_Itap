@@ -1,3 +1,5 @@
+"use strict";
+
 import invariant from 'invariant';
 export const validateSnapPoint = snapPoint => {
   invariant(typeof snapPoint === 'number' || typeof snapPoint === 'string', `'${snapPoint}' is not a valid snap point! expected types are string or number.`);

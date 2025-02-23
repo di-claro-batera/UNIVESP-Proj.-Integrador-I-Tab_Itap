@@ -2,22 +2,40 @@ import React from 'react';
 import { Cover, GradientView, Title, Text, Badge, Box, Touchable, Button, TextInput } from '../../styles';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../styles/theme.json';
-import { Linking, View } from 'react-native';
+import { Linking, View, Share } from 'react-native';
 import { ScaledSheet, moderateScale } from 'react-native-size-matters';
 import { useFontSize } from '../../components/ModalAgendamento/FontSizeContext'; // Importando o contexto do tamanho da fonte
+import { useSelector, useDispatch } from 'react-redux';
+import { updateForm } from '../../store/modules/manicure/actions';
 
 const Header = () => {
+
+    const dispatch = useDispatch();
+
+    const {manicure, servicos} = useSelector(state => state.manicure);
+
     const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize(); // Usando o contexto de tamanho de fonte
 
     const openGoogleMaps = () => {
         const url = 'https://www.google.com/maps/search/?api=1&query=-21.732531,-48.686678';
-        Linking.openURL(url).catch(err => console.error('An error occurred', err));
+        Linking.openURL(url).catch(error => {
+            console.error('An error occurred', error);
+        });
     };
+
+    const handleShareOnWhatsApp = () => {
+            const message = 'Olá, estou compartilhando o Mari Care com você!'; // Mensagem que será enviada
+            const url = `whatsapp://send?text=${encodeURIComponent(message)}`; // Cria a URL do WhatsApp
+    
+            Linking.openURL(url).catch(() => {
+                alert('O WhatsApp não está instalado no seu dispositivo.'); // Trata o caso em que o WhatsApp não está instalado
+            });
+        };
 
     return (
         <>
             <Cover
-                image="https://cleanexpressdescartaveis.com.br/wp-content/webp-express/webp-images/uploads/2021/10/clean.jpg.webp"
+                image="https://s28461.pcdn.co/wp-content/uploads/2015/12/Manicure-con-gel_-duradero-pero-problema%CC%81tico-para-la-salud.jpg"
                 width="100%"
                 height="220px"
             >
@@ -28,7 +46,7 @@ const Header = () => {
                 >
                     <Text color="light">Tabatinga-SP •</Text>
                     <Title color="light" style={styles(fontScale).title}>Mari Care</Title>
-                    <Badge color="sucess">ABERTO</Badge>
+                    <Badge color={manicure.isOpened ? "sucess" : "danger"}>{manicure.isOpened ? 'ABERTO' : 'FECHADO'}</Badge>
                 </GradientView>
                 <View style={styles(fontScale).fontButtonsContainer}>
                     <Touchable onPress={decreaseFontSize} style={styles(fontScale).circleButton}>
@@ -46,6 +64,7 @@ const Header = () => {
                         direction="column"
                         align="center"
                         spacing="0px 10px 0 0"
+                        onPress={() => Linking.openURL(`tel:01516997751719`)}
                         accessibilityLabel="Ligar para Mari Care"
                         accessibilityHint="Dê um toque duplo para ligar"
                     >
@@ -67,6 +86,7 @@ const Header = () => {
                         width="60px"
                         direction="column"
                         align="center"
+                        onPress={handleShareOnWhatsApp}
                         accessibilityLabel="Compartilhar Mari Care"
                         accessibilityHint="Dê um toque duplo para compartilhar"
                     >
@@ -89,9 +109,12 @@ const Header = () => {
                 </Box>
             </Box>
             <Box hasPadding direction="column" background="light" spacing="15px 0 0">
-                <Title small style={styles(fontScale).titleSmall}>Serviços (3)</Title>
+                <Title small style={styles(fontScale).titleSmall}>Serviços ({servicos.length})</Title>
                 <TextInput
                     placeholder="Digite o nome do serviço..."
+                    onChangeText={(value) => dispatch(updateForm({ inputFiltro: value }))}
+                    onFocus={() => dispatch(updateForm({ inputFiltroFoco: true }))}
+                    onBlur={() => dispatch(updateForm({ inputFiltroFoco: false }))}
                     accessibilityLabel="Campo de busca"
                     accessibilityHint="Digite o nome do serviço que está procurando"
                 />

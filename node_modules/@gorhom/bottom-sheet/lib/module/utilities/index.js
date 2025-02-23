@@ -1,3 +1,5 @@
+"use strict";
+
 export { normalizeSnapPoint } from './normalizeSnapPoint';
 export { animate } from './animate';
 export { getKeyboardAnimationConfigs } from './getKeyboardAnimationConfigs';

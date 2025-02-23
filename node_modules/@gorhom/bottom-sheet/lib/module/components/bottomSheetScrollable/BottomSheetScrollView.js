@@ -1,3 +1,5 @@
+"use strict";
+
 import { memo } from 'react';
 import { ScrollView as RNScrollView } from 'react-native';
 import Animated from 'react-native-reanimated';

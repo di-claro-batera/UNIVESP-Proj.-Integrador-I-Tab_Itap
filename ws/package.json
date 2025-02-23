@@ -27,5 +27,8 @@
     "pagarme": "^4.35.1",
     "slices": "^0.1.4",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

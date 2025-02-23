@@ -8,6 +8,7 @@ import { fonts } from './src/styles/theme.json';
 import { Provider as StoreProvider } from 'react-redux';
 import { DefaultTheme, configureFonts, Provider as PaperProvider } from 'react-native-paper';
 import store from './src/store';
+import './src/config/reactotron'; // Importar a configuração do Reactotron com o caminho correto
 
 const theme = {
   ...DefaultTheme,
