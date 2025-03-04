@@ -12,7 +12,8 @@ const INITIAL_STATE = {
         disabled: true,
         saving: false,
     },
-    colaboradores: [],
+    colaboradores: [], // Adicionado o array vazio
+    colaboradoresDisponiveis: [], // Adicionado o array vazio
     servicos: [],
     colaborador: {
         email: '',
@@ -21,7 +22,7 @@ const INITIAL_STATE = {
         dataNascimento: '',
         sexo: 'M',
         vinculo: 'A',
-        especialidades: [],
+        especialidades: [], // Adicionado o array vazio
         contaBancaria: {
             titular: '',
             cpfCnpj: '',
@@ -35,10 +36,10 @@ const INITIAL_STATE = {
 };
 
 function colaborador(state = INITIAL_STATE, action) {
-    switch(action.type) {
+    switch (action.type) {
         case types.UPDATE_COLABORADOR: {
             return produce(state, draft => {
-                draft = { ...draft, ...action.payload};
+                draft = { ...draft, ...action.payload };
                 return draft;
             });
         }
@@ -50,8 +51,15 @@ function colaborador(state = INITIAL_STATE, action) {
             });
         }
 
-        default: 
-        return state;
+        case types.COLABORADORES_DISPONIVEIS: {
+            return produce(state, draft => {
+                draft.colaboradoresDisponiveis = action.payload.colaboradores;
+                return draft;
+            });
+        }
+
+        default:
+            return state;
     }
 }
 

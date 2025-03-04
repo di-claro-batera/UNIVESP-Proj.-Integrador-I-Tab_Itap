@@ -1,11 +1,11 @@
-import React, { useCallback, useRef, useMemo, useState } from 'react';
+import React, { useCallback, useRef, useMemo, useState, useEffect } from 'react';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { FontSizeProvider, useFontSize } from './FontSizeContext';
 import ModalHeader from './header';
-import Resume from './resume'; // Importando o Resume corretamente
+import Resume from './resume';
 import theme from '../../styles/theme.json';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,35 +14,64 @@ import EspecialistaPicker from './Especialistas';
 import EspecialistaModal from './Especialistas/modal';
 import PaymentPicker from './payment';
 import { Box } from '../../styles';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import util from '../../util';
+import moment from 'moment';
+import { updateAgendamento } from '../../store/modules/manicure/actions';
+import { Button } from 'react-native-paper';
+import { saveAgendamento } from '../../store/modules/manicure/sagas';
+import { saveAgendamentoRequest } from '../../store/modules/manicure/actions';
 
 const ModalAgendamento = () => {
-    const { form, agendamento, servicos, agenda } = useSelector(state => state.manicure);
+    const { form, agendamento, servicos, agenda, colaboradores } = useSelector(state => state.manicure);
+    const dispatch = useDispatch();
     const sheetRef = useRef(null);
 
-    // Encontra o serviço selecionado
-    const servico = servicos.find((s) => s._id === agendamento.servicoId); // Use _id aqui
+    const dataSelecionada = moment(agendamento.data).format('YYYY-MM-DD');
+    const horaSelecionada = moment(agendamento.data).format('HH:mm');
+    const { horariosDisponiveis, colaboradoresDia } = util.selectAgendamento(agenda, dataSelecionada, agendamento.colaboradorId);
 
-    // Verifica se o serviço foi encontrado
+    const servico = servicos.find((s) => s._id === agendamento.servicoId);
     const servicoValido = servico ? servico : null;
 
-    // Função para abrir a modal
-    const openModal = useCallback(() => {
-        if (sheetRef.current) {
-            sheetRef.current.snapToIndex(1); // Abre a modal no índice 1
-        }
-    }, []);
-
-    // Função para fechar a modal
-    const closeModal = useCallback(() => {
-        if (sheetRef.current) {
-            sheetRef.current.snapToIndex(0); // Fecha a modal (volta ao índice 0)
-        }
-    }, []);
-
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isEspecialistaModalVisible, setEspecialistaModalVisible] = useState(false);
+
     const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize();
     const snapPoints = useMemo(() => ['100%', '99%'], []);
+
+    // Define um colaborador padrão ao carregar a página
+    useEffect(() => {
+        if (colaboradores.length > 0 && !agendamento.colaboradorId) {
+            const colaboradorPadrao = colaboradores[0]; // Primeiro colaborador da lista
+            dispatch(updateAgendamento({ colaboradorId: colaboradorPadrao._id }));
+        }
+    }, [colaboradores, agendamento.colaboradorId, dispatch]);
+
+    const openModal = useCallback(() => {
+        if (sheetRef.current) {
+            sheetRef.current.snapToIndex(1);
+        }
+    }, []);
+
+    const closeModal = useCallback(() => {
+        if (sheetRef.current) {
+            sheetRef.current.snapToIndex(0);
+        }
+    }, []);
+
+    const openEspecialistaModal = useCallback(() => {
+        setEspecialistaModalVisible(true);
+    }, []);
+
+    const closeEspecialistaModal = useCallback(() => {
+        setEspecialistaModalVisible(false);
+    }, []);
+
+    const handleColaboradorSelect = useCallback((colaborador) => {
+        dispatch(updateAgendamento({ colaboradorId: colaborador._id }));
+        closeEspecialistaModal();
+    }, [dispatch]);
 
     const handleSheetChange = useCallback((index) => {
         console.log('handleSheetChange', index);
@@ -53,7 +82,7 @@ const ModalAgendamento = () => {
         <GestureHandlerRootView style={[styles.container, { paddingTop: isExpanded ? 810 : 100 }]}>
             <BottomSheet
                 ref={sheetRef}
-                index={0} // Índice inicial fechado
+                index={0}
                 snapPoints={snapPoints}
                 onChange={handleSheetChange}
                 enablePanDownToClose={false}
@@ -86,8 +115,18 @@ const ModalAgendamento = () => {
                                 </Text>
                             </Box>
                         )}
-                        <DateTime servico={servicoValido} servicos={servicos} agendamento={agendamento} agenda={agenda} />
-                        <EspecialistaPicker />
+                        <DateTime 
+                            servico={servicoValido} 
+                            agenda={agenda}
+                            dataSelecionada={dataSelecionada}
+                            horaSelecionada={horaSelecionada}
+                            horariosDisponiveis={horariosDisponiveis}
+                        />
+                        <EspecialistaPicker
+                            colaboradores={colaboradores}
+                            agendamento={agendamento}
+                            onOpenEspecialistaModal={openEspecialistaModal}
+                        />
                         <PaymentPicker />
                         <Box hasPadding>
                             <LinearGradient
@@ -96,7 +135,8 @@ const ModalAgendamento = () => {
                             >
                                 <TouchableOpacity
                                     style={styles.buttonContainer}
-                                    onPress={openModal}
+                                    onPress={() => dispatch(saveAgendamentoRequest())}
+                                    disabled={form.agendamentoLoading}
                                 >
                                     <Icon name="check" color={theme.colors.light} size={32} />
                                     <Text style={styles.confirmButtonText}>Confirmar Meu Agendamento</Text>
@@ -104,25 +144,16 @@ const ModalAgendamento = () => {
                             </LinearGradient>
                         </Box>
                     </ScrollView>
-                    <View style={styles.fontButtonsContainer}>
-                        <TouchableOpacity
-                            onPress={decreaseFontSize}
-                            style={styles.circleButton}
-                            accessibilityLabel="Diminuir Tamanho da Fonte"
-                            accessibilityHint="Dê um toque duplo para diminuir o tamanho da fonte"
-                        >
-                            <Text style={styles.buttonText}>A-</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={increaseFontSize}
-                            style={styles.circleButton}
-                            accessibilityLabel="Aumentar Tamanho da Fonte"
-                            accessibilityHint="Dê um toque duplo para aumentar o tamanho da fonte"
-                        >
-                            <Text style={styles.buttonText}>A+</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <EspecialistaModal />
+                    <EspecialistaModal
+                        isVisible={isEspecialistaModalVisible}
+                        onClose={closeEspecialistaModal}
+                        colaboradores={colaboradores}
+                        onSelectColaborador={handleColaboradorSelect}
+                        agendamento={agendamento}
+                        servicos={servicos}
+                        colaboradoresDia={colaboradoresDia}
+                        horaSelecionada={horaSelecionada}
+                    />
                 </BottomSheetView>
             </BottomSheet>
         </GestureHandlerRootView>
@@ -207,7 +238,7 @@ const styles = StyleSheet.create({
     circleButton: {
         width: 30,
         height: 30,
-        borderRadius: 15, // Corrigido para garantir que seja um círculo
+        borderRadius: 15,
         backgroundColor: theme.colors.primary,
         alignItems: 'center',
         justifyContent: 'center',

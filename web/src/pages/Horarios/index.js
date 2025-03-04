@@ -12,80 +12,106 @@ const localizer = momentLocalizer(moment);
 const Horarios = () => {
 
     const dispatch = useDispatch();
-    const { horarios, horario, servicos, components, colaboradores, form, behavior } = useSelector(state => state.horario);
+    const { horarios, horario, servicos, components, form, behavior } = useSelector(state => state.horario);
+    const colaboradoresDisponiveis = useSelector(state => state.horario.colaboradoresDisponiveis);
+    const colaboradores = useSelector(state => state.horario.colaboradores);
+    console.log('Colaboradores Disponíveis:', colaboradoresDisponiveis);
+    console.log('Colaboradores:', colaboradores);
 
-        const diasSemanaData = [
-            new Date(2024, 9, 6, 0, 0, 0, 0),
-            new Date(2024, 9, 7, 0, 0, 0, 0),
-            new Date(2024, 9, 8, 0, 0, 0, 0),
-            new Date(2024, 9, 9, 0, 0, 0, 0),
-            new Date(2024, 9, 10, 0, 0, 0, 0),
-            new Date(2024, 9, 11, 0, 0, 0, 0),
-            new Date(2024, 9, 12, 0, 0, 0, 0),
-        ];
+    const diasSemanaData = [
+        new Date(2024, 9, 6, 0, 0, 0, 0),
+        new Date(2024, 9, 7, 0, 0, 0, 0),
+        new Date(2024, 9, 8, 0, 0, 0, 0),
+        new Date(2024, 9, 9, 0, 0, 0, 0),
+        new Date(2024, 9, 10, 0, 0, 0, 0),
+        new Date(2024, 9, 11, 0, 0, 0, 0),
+        new Date(2024, 9, 12, 0, 0, 0, 0),
+    ];
 
-        const diasDaSemana = [
-            'domingo',
-            'segunda-feira',
-            'terça-feira',
-            'quarta-feira',
-            'quinta-feira',
-            'sexta-feita',
-            'sábado',
-        ];
+    const diasDaSemana = [
+        'domingo',
+        'segunda-feira',
+        'terça-feira',
+        'quarta-feira',
+        'quinta-feira',
+        'sexta-feita',
+        'sábado',
+    ];
 
-        const formatEvents = horarios.map((horario, index) => 
-            horario.dias.map((dia) => ({
+    const formatEvents = horarios.map((horario, index) =>
+        horario.dias.map((dia) => {
+            console.log('Horário:', horario);
+            return {
                 resource: horario,
-                title: `${horario.especialidades.length} espec. e ${horario.colaboradores.length} colab.`,
+                title: `${horario.especialidades.length} espec. e ${horario.colaboradores.length} colaborador`,
                 start: new Date(
                     diasSemanaData[dia].setHours(
                         parseInt(moment(horario.inicio).format('HH')),
                         parseInt(moment(horario.inicio).format('mm')),
                     )
                 ),
-            end: new Date(
-                diasSemanaData[dia].setHours(
-                    parseInt(moment(horario.fim).format('HH')),
-                    parseInt(moment(horario.fim).format('mm')),
+                end: new Date(
+                    diasSemanaData[dia].setHours(
+                        parseInt(moment(horario.fim).format('HH')),
+                        parseInt(moment(horario.fim).format('mm')),
+                    )
                 )
-            )
-        }))
-        ).flat();
+            };
+        })
+    ).flat();
 
-        const setComponent = (component, state) => {
-            dispatch(
-                updateHorario({
-                    components: { ...components, [component]: state },
-               })
-            );
-        };
+    const setComponent = (component, state) => {
+        dispatch(
+            updateHorario({
+                components: { ...components, [component]: state },
+            })
+        );
+    };
 
-        const setHorario = (key, value) => {
-            dispatch(
-                updateHorario({
-                    horario: { ...horario, [key]: value },
-               })
-            );
-        };
+    const setHorario = (key, value) => {
+        dispatch(
+            updateHorario({
+                horario: { ...horario, [key]: value },
+            })
+        );
+    };
 
-        const save = () => {
-            dispatch(addHorario());
-        };
+    const save = () => {
+        dispatch(addHorario());
+    };
 
-        const remove = () => {
-            dispatch(removeHorario());
-        };
+    const remove = () => {
+        dispatch(removeHorario());
+    };
 
-        useEffect(() => {
+    useEffect(() => {
+        dispatch(allHorarios());
+        dispatch(allServicos());
 
-            dispatch(allHorarios());
-            dispatch(allServicos());
-        }, [dispatch]);
+    }, [dispatch]);
 
-        useEffect(() => {
-            dispatch(filterColaboradores());
-        }, [dispatch, horario.especialidades]);
+    useEffect(() => {
+        dispatch(filterColaboradores());
+    }, [dispatch, horario.especialidades]);
+
+    useEffect(() => {
+        console.log('Horário Colaboradores:', horario.colaboradores);
+    }, [horario.colaboradores]);
+
+    console.log('Dados do TagPicker:', colaboradores.map(colaborador => ({
+        label: colaborador.nome,
+        value: colaborador._id,
+    })));
+
+    const handleNavigate = (date) => {
+        console.log('Navegando para:', date);
+        // Adicione aqui a lógica para lidar com a navegação para uma nova data
+    };
+
+    const handleView = (view) => {
+        console.log('Visualização alterada para:', view);
+        // Adicione aqui a lógica para lidar com a alteração de visualização
+    };
 
     return (
         <div className="col p-5 overflow-auto h-100">
@@ -115,7 +141,7 @@ const Horarios = () => {
                                 block
                                 format="HH:mm"
                                 hideMinutes={(min) => ![0, 30].includes(min)}
-                                value={horario.inicio}
+                                value={horario.inicio ? moment(horario.inicio).toDate() : null}
                                 onChange={(e) => {
                                     setHorario('inicio', e);
                                 }}
@@ -128,7 +154,7 @@ const Horarios = () => {
                                 block
                                 format="HH:mm"
                                 hideMinutes={(min) => ![0, 30].includes(min)}
-                                value={horario.fim}
+                                value={horario.fim ? moment(horario.fim).toDate() : null}
                                 onChange={(e) => {
                                     setHorario('fim', e);
                                 }}
@@ -149,20 +175,24 @@ const Horarios = () => {
                         </div>
                         <div className="col-12 mt-3">
                             <b>Colaboradores Disponíveis</b>
-                                <TagPicker
-                                    size="lg"
-                                    block
-                                    data={colaboradores}
-                                    value={horario.colaboradores}
-                                    onChange={(e) => {
-                                        setHorario('colaboradores', e)
-                                    }}
-                                />
+                            <TagPicker
+                                size="lg"
+                                block
+                                data={colaboradores.map(colaborador => ({
+                                    label: colaborador.nome, // Use o nome do colaborador como label
+                                    value: colaborador._id, // Use o ID do colaborador como value
+                                }))}
+                                value={horario.colaboradores}
+                                onChange={(e) => {
+                                    console.log('Valores selecionados:', e);
+                                    setHorario('colaboradores', e)
+                                }}
+                            />
                         </div>
                     </div>
                     <Button
                     loading={form.saving}
-                    color={behavior === 'create' ? 'green' : 'primary'}
+                    color={behavior === 'create' ? 'green' : 'cyan'}
                     size="lg"
                     block
                     onClick={save}
@@ -273,6 +303,8 @@ const Horarios = () => {
                         events={formatEvents}
                         date={diasSemanaData[moment().day()]}
                         view="week"
+                        onNavigate={handleNavigate} // Adicione esta linha
+                        onView={handleView} // Adicione esta linha
                         style={{ height: 600 }}
                     />
                 </div>

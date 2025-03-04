@@ -24,6 +24,10 @@ export function updateAgendamento(agendamento) {
     return { type: types.UPDATE_AGENDAMENTO, agendamento};
 }
 
+export const saveAgendamentoRequest = () => ({
+    type: types.SAVE_AGENDAMENTO,
+});
+
 export function updateAgenda(agenda) {
     return { type: types.UPDATE_AGENDA, agenda};
 }
@@ -31,3 +35,11 @@ export function updateAgenda(agenda) {
 export function filterAgenda() {
     return { type: types.FILTER_AGENDA,};
 }
+
+export function updateColaboradores(colaboradores) {
+    return { type: types.UPDATE_COLABORADORES, colaboradores};
+}
+
+export const closeModalAgendamento = () => ({
+    type: types.CLOSE_MODAL_AGENDAMENTO,
+});

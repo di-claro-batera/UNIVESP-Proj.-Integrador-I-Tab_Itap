@@ -7,6 +7,9 @@ const types = {
     UPDATE_AGENDAMENTO: '@manicure/UPDATE_AGENDAMENTO',
     FILTER_AGENDA: '@manicure/FILTER_AGENDA',
     UPDATE_AGENDA: '@manicure/UPDATE_AGENDA',
+    UPDATE_COLABORADORES: '@manicure/UPDATE_COLABORADORES',
+    SAVE_AGENDAMENTO: '@manicure/SAVE_AGENDAMENTO',
+    CLOSE_MODAL_AGENDAMENTO: '@manicure/CLOSE_MODAL_AGENDAMENTO',
 };
 
 export default types;

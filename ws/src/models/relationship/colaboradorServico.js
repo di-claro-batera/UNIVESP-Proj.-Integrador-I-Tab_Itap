@@ -22,6 +22,8 @@ const colaboradorServico = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { timestamps: true }); // Adiciona timestamps
+
+colaboradorServico.index({ colaboradorId: 1, servicoId: 1 }); // Índice composto
 
 module.exports = mongoose.model('ColaboradorServico', colaboradorServico);

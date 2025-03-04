@@ -1,71 +1,85 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Text, Cover, Button } from '../../../styles';
 import theme from '../../../styles/theme.json';
-import { StyleSheet } from 'react-native';
-import { useFontSize } from '../FontSizeContext'; // Importando o contexto do tamanho da fonte
-import EspecialistaModal from './modal'; // Certifique-se de importar a modal corretamente
+import { StyleSheet, View } from 'react-native';
+import { useFontSize } from '../FontSizeContext';
 
-const EspecialistaPicker = () => {
-    const [isModalVisible, setModalVisible] = useState(false); // Estado para controlar a visibilidade da modal
-    const { fontScale } = useFontSize(); // Usando o contexto do tamanho da fonte
+const EspecialistaPicker = ({ colaboradores, agendamento, onOpenEspecialistaModal }) => {
+    const { fontScale } = useFontSize();
+
+    const colaboradorSelecionado = colaboradores.find(c => c._id === agendamento.colaboradorId) || {
+        foto: 'https://via.placeholder.com/150', // URL de uma imagem padrão
+        nome: 'Colaborador não selecionado', // Nome padrão
+    };
+
+    console.log("Colaborador selecionado:", colaboradorSelecionado); // Depuração
 
     return (
         <>
             <Text bold color="dark" hasPadding style={{ fontSize: 16 * fontScale }}>
-                Selecione o Modo de Atendimento:
+                Escolha o Colaborador:
             </Text>
             <Box hasPadding removePaddingBottom removePaddingTop>
-                <Box align="center">
-                    <Cover
-                        width="45px"
-                        height="45px"
-                        circle
-                        image="https://www.primecursos.com.br/arquivos/uploads/2013/08/manicure-pedicure.jpg"
-                    />
-                    <Box direction="column">
-                        <Text style={[styles.nameText, { fontSize: 18 * fontScale }]}>Marineuza Pires</Text>
-                        <Text style={[styles.subText, { fontSize: 14 * fontScale }]} small>Atendimento a Domicílio</Text>
+                <Box direction="row" align="center" justify="space-between">
+                    <Box direction="row" align="center" spacing="0 10px 0 0">
+                        <Cover
+                            width="45px"
+                            height="45px"
+                            circle
+                            image={colaboradorSelecionado.foto}
+                        />
+                        <Box direction="column" style={styles.nameContainer}>
+                            <Text style={[styles.nameText, { fontSize: 18 * fontScale }]}>
+                                {colaboradorSelecionado.nome}
+                            </Text>
+                        </Box>
                     </Box>
-                </Box>
-                <Box>
                     <Button
                         uppercase={false}
                         textColor={theme.colors.dark}
                         background={theme.colors.light}
                         mode="contained"
-                        block
                         labelStyle={[styles.buttonText, { fontSize: 16 * fontScale }]}
                         style={styles.buttonBackground}
-                        onPress={() => setModalVisible(true)} // Abre a modal ao clicar no botão
+                        onPress={onOpenEspecialistaModal}
                     >
-                        Trocar Atendimento
+                        <View style={styles.buttonTextContainer}>
+                            <Text style={styles.buttonText}>Trocar</Text>
+                            <Text style={styles.buttonText}>Colaborador</Text>
+                        </View>
                     </Button>
                 </Box>
             </Box>
-            <EspecialistaModal
-                isVisible={isModalVisible}
-                onClose={() => setModalVisible(false)} // Fecha a modal
-            />
         </>
     );
 };
 
 const styles = StyleSheet.create({
-    nameText: {
-        fontFamily: theme.fonts.regular.fontFamily, // Fonte personalizada para nome
+    nameContainer: {
+        flex: 1, // Ocupa o espaço disponível
+        marginRight: 8, // Espaçamento entre o nome e o botão
     },
-    subText: {
-        fontFamily: theme.fonts.light.fontFamily, // Fonte personalizada para subtítulo
+    nameText: {
+        fontFamily: theme.fonts.regular.fontFamily,
+        flexShrink: 1, // Permite que o texto quebre para a próxima linha se necessário
     },
     buttonText: {
-        fontFamily: theme.fonts.medium.fontFamily, // Fonte personalizada para botão
-        color: theme.colors.dark, // Mudei para combinar com o textColor
+        fontFamily: theme.fonts.medium.fontFamily,
+        color: theme.colors.dark,
+        textAlign: 'center', // Centraliza o texto no botão
+        fontSize: 14, // Tamanho do texto do botão (ajuste aqui)
     },
     buttonBackground: {
-        backgroundColor: '#F5F6F7', // Cor mais clara para o fundo do botão
-        borderColor: theme.colors.dark, // Cor da borda
-        borderWidth: 1, // Largura da borda
-        borderRadius: 10, // Ajuste o raio da borda
+        backgroundColor: '#F5F6F7',
+        borderColor: theme.colors.dark,
+        borderWidth: 1,
+        borderRadius: 10,
+        width: 130, // Largura do botão (ajuste aqui)
+        paddingVertical: 5, // Espaçamento interno vertical (ajuste aqui)
+        paddingHorizontal: 1, // Espaçamento interno horizontal (ajuste aqui)
+    },
+    buttonTextContainer: {
+        alignItems: 'center', // Centraliza o conteúdo
     },
 });
 

@@ -1,44 +1,37 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import 'moment/locale/pt-br'; // Importa o locale em português
+import 'moment/locale/pt-br';
 import { useDispatch, useSelector } from 'react-redux';
-import util from '../../util';
-
 import { filterAgendamentos } from '../../store/modules/agendamento/actions';
 
-moment.locale('pt-br'); // Define o locale para português
+moment.locale('pt-br');
 const localizer = momentLocalizer(moment);
 
 const Agendamentos = () => {
-
     const dispatch = useDispatch();
     const { agendamentos } = useSelector((state) => state.agendamento);
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [currentView, setCurrentView] = useState('week');
 
-    console.log(agendamentos);
+    const formatEventos = agendamentos.map((agendamento) => {
+        const dataInicio = moment(agendamento.data);
+        const duracaoMinutos = agendamento.servicoId.duracao; // Duração em minutos
 
-    const formatEventos = agendamentos.map(agendamento => ({
-        title: `${agendamento.servicoId.titulo} - ${agendamento.clienteId.nome} - ${agendamento.colaboradorId.nome}`,
-        start: moment(agendamento.data).toDate(),
-        end: moment(agendamento.data)
-        .add(
-            util.hourToMinutes(
-                moment(agendamento.servicoId.duracao, "HH:mm").format('HH:mm')
-            ),
-            'minutes'
-        )
-        .toDate(),
-        
-    }));
+        return {
+            title: `${agendamento.servicoId.titulo} - ${agendamento.clienteId.nome} - ${agendamento.colaboradorId.nome}`,
+            start: dataInicio.toDate(),
+            end: dataInicio.clone().add(duracaoMinutos, 'minutes').toDate(), // Adiciona a duração em minutos
+        };
+    });
 
-    const formatRange = (periodo) =>{
+    const formatRange = (periodo) => {
         let finalRange = {};
         if (Array.isArray(periodo)) {
             finalRange = {
                 start: moment(periodo[0]).format('YYYY-MM-DD'),
-                end: moment(periodo[periodo.length -1]).format('YYYY-MM-DD'),
+                end: moment(periodo[periodo.length - 1]).format('YYYY-MM-DD'),
             };
         } else {
             finalRange = {
@@ -46,17 +39,11 @@ const Agendamentos = () => {
                 end: moment(periodo.end).format('YYYY-MM-DD'),
             };
         }
-
         return finalRange;
     };
 
     useEffect(() => {
-        dispatch(
-            filterAgendamentos(
-                moment().weekday(0).format('YYYY-MM-DD'),
-                moment().weekday(6).format('YYYY-MM-DD'),
-            )
-        );
+        dispatch(filterAgendamentos(moment().weekday(0).format('YYYY-MM-DD'), moment().weekday(6).format('YYYY-MM-DD')));
     }, [dispatch]);
 
     return (
@@ -64,27 +51,29 @@ const Agendamentos = () => {
             <div className="row">
                 <div className="col-12">
                     <h2 className="mb-4 mt-0">Agendamentos</h2>
-                        <Calendar
-                            localizer={localizer}
-                            onRangeChange={(periodo) => {
-                                const { start, end } = formatRange(periodo)
-                                dispatch(
-                                    filterAgendamentos(start, end));
-                            }}
-                            events={formatEventos}
-                            defaultView="week"
-                            selectable={true}
-                            popup
-                            style={{ height: 600 }}
-                            messages={{
-                                next: "Próximo",
-                                previous: "Anterior",
-                                today: "Hoje",
-                                month: "Mês",
-                                week: "Semana",
-                                day: "Dia",
-                            }}
-                        />
+                    <Calendar
+                        localizer={localizer}
+                        onRangeChange={(periodo) => {
+                            const { start, end } = formatRange(periodo);
+                            dispatch(filterAgendamentos(start, end));
+                        }}
+                        events={formatEventos}
+                        view={currentView}
+                        onView={(view) => setCurrentView(view)}
+                        selectable={true}
+                        popup
+                        style={{ height: 600 }}
+                        messages={{
+                            next: 'Próximo',
+                            previous: 'Anterior',
+                            today: 'Hoje',
+                            month: 'Mês',
+                            week: 'Semana',
+                            day: 'Dia',
+                        }}
+                        date={currentDate}
+                        onNavigate={(date) => setCurrentDate(date)}
+                    />
                 </div>
             </div>
         </div>

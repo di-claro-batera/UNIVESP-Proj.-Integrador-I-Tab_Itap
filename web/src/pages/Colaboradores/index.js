@@ -165,7 +165,7 @@ const Colaboradores = () => {
                 </div>
                 <Button
             loading={form.saving}
-            color={behavior === 'create' ? 'green' : 'primary'}
+            color={behavior === 'create' ? 'green' : 'violet'}
             size="lg"
             block
             onClick={() => save()}

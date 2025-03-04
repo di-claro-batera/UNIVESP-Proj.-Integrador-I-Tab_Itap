@@ -4,7 +4,7 @@
         "light": "#f5f6f7",
         "sucess": "#25D84C",
         "danger": "#d62828",
-        "dark": "#21232f",
+        "dark": "#0f1015",
         "muted": "#5E6171",
         "transparent": "rgba(255, 255, 255, 0.0)" 
     },

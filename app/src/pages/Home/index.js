@@ -34,8 +34,8 @@ const HomeContent = () => {
                 style={{ backgroundColor: util.toAlpha(theme.colors.muted, 10) }}
                 ListHeaderComponent={<Header />}
                 data={finalServicos}
-                renderItem={({ item }) => (<Servico servico={item} key={item} />)}
-                keyExtractor={(item) => item}
+                renderItem={({ item }) => (<Servico servico={item} />)}
+                keyExtractor={(item) => item._id}
             />
             <ModalAgendamento />
         </GestureHandlerRootView>

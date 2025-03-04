@@ -28,3 +28,19 @@ export function removeHorario() {
 export function allServicos() {
     return { type:types.ALL_SERVICOS };
 }
+
+export function updateColaboradoresDisponiveis(colaboradores) {
+    return {
+        type: 'UPDATE_COLABORADORES_DISPONIVEIS',
+        payload: colaboradores,
+    };
+}
+
+export const UPDATE_COLABORADORES = 'UPDATE_COLABORADORES';
+
+export function updateColaboradores(colaboradores) {
+    return {
+        type: UPDATE_COLABORADORES,
+        payload: colaboradores,
+    };
+}

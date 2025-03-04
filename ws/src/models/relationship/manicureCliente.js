@@ -22,6 +22,8 @@ const manicureCliente = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { timestamps: true }); // Adiciona timestamps
+
+manicureCliente.index({ manicureId: 1, clienteId: 1 }); // Índice composto
 
 module.exports = mongoose.model('ManicureCliente', manicureCliente);

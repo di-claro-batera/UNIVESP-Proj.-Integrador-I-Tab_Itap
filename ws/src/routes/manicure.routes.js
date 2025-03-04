@@ -3,7 +3,7 @@ const router = express.Router();
 const Manicure = require('../models/manicure');
 const Servico = require('../models/servico');
 const Horario = require('../models/horario');
-//const turf = require('@turf/turf');
+const util = require('../util');
 
 
 router.post('/', async (req, res) => {
@@ -47,14 +47,6 @@ router.get('/:id', async (req, res) => {
       return;
     }
 
-    /*
-    const distance = turf
-      .distance(
-        turf.point([-21.745909, -48.661047]),
-        turf.point([-30.043858, -51.103487])
-      )
-      .toFixed(2);
-*/
 
     const horarios = await Horario.find({
       manicureId: req.params.id,

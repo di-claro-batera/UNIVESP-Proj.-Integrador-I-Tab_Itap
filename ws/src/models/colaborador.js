@@ -13,8 +13,8 @@ const colaborador = new Schema({
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: false,
+    unique: false,
   },
   senha: {
     type: String,

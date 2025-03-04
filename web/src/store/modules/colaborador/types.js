@@ -6,6 +6,7 @@ const types = {
     RESET_COLABORADOR: '@colaborador/RESET',
     ALL_SERVICOS: '@colaborador/ALL_SERVICOS',
     UNLINK_COLABORADOR: '@colaborador/UNLINK',
+    COLABORADORES_DISPONIVEIS: 'COLABORADORES_DISPONIVEIS',
 };
 
 export default types;

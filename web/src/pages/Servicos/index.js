@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { Button, Drawer, Modal, IconButton, DatePicker, Uploader, Tag } from 'rsuite';
 import { Image } from '@rsuite/icons';
 import Table from '../../components/Table';
-import moment from 'moment';
 import consts from '../../consts';
 import RemindFillIcon from '@rsuite/icons/RemindFill';
+import util from '../../util';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -275,7 +275,7 @@ const Servicos = () => {
                             label: 'Duração',
                             key: 'duracao',
                             sortable: true,
-                            content: (servico) => moment(servico.duracao).format('HH:mm'),
+                            content: (servico) => util.minutesToHHMM(servico.duracao),
                         },
                         {
                             label: 'Status',

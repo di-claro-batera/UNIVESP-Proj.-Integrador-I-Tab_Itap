@@ -55,12 +55,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.light,
-    fontSize: 24,
+    fontSize: 26,
     fontFamily: "Pattaya-Regular",
   },
   subtitle: {
     color: theme.colors.light,
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "PoiretOne-Regular",
   },
 });

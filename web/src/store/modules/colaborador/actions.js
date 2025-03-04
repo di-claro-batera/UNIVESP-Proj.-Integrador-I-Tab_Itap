@@ -28,3 +28,14 @@ export function unlinkColaborador() {
 export function allServicos() {
     return { type:types.ALL_SERVICOS };
 }
+
+export function colaboradoresDisponiveisAction(payload) {
+    return { type: types.COLABORADORES_DISPONIVEIS, payload };
+}
+
+export function updateColaboradoresDisponiveis(colaboradores) {
+    return {
+        type: 'UPDATE_COLABORADORES_DISPONIVEIS', // ou o tipo de ação correto
+        payload: colaboradores,
+    };
+}

@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 import types from './types';
-import moment from 'moment';
+
 
 const INITIAL_STATE = {
     behavior: 'create',
@@ -18,7 +18,7 @@ const INITIAL_STATE = {
       titulo: '',
       preco: '',
       comissao: '',
-      duracao: moment('00:30', 'HH:mm').format(),
+      duracao: 30,
       recorrencia: '',
       descricao: '',
       status: 'A',

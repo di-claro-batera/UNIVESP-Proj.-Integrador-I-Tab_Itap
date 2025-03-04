@@ -90,7 +90,7 @@ const Header = () => {
                         accessibilityLabel="Compartilhar Mari Care"
                         accessibilityHint="Dê um toque duplo para compartilhar"
                     >
-                        <Icon name="share" size={28} color={theme.colors.muted} />
+                        <Icon name="whatsapp" size={28} color={theme.colors.muted} />
                         <Text small spacing="5px 0 0" style={styles(fontScale).text}>Enviar</Text>
                     </Touchable>
                 </Box>

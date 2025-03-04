@@ -34,7 +34,7 @@ const Resume = ({ servico }) => {
                     {servico?.titulo || 'Título não disponível'}
                 </Title>
                 <Text style={{ fontSize: 16 * fontScale, fontFamily: theme.fonts.regular.fontFamily }}>
-                    Total R$ {servico?.preco || '0,00'}
+                    Total R$ {servico?.preco || '0,00'}.00
                 </Text>
             </Box>
         </Box>
