@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 
@@ -35,6 +34,12 @@ const Sidebar = () => {
                     <Link to="/horarios">
                         <span className="mdi mdi-clock-check-outline"></span>
                         <span>Horários</span>
+                    </Link>    
+                </li>
+                <li>
+                    <Link to="/relatorios">
+                        <span className="mdi mdi-chart-bar"></span> {/* Icone de gráfico */}
+                        <span>Relatórios</span>
                     </Link>    
                 </li>
             </ul>

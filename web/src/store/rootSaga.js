@@ -1,12 +1,19 @@
-import { all } from 'redux-saga/effects'
+import { all } from 'redux-saga/effects';
 
-import agendamento from './modules/agendamento/sagas';
-import clientes from './modules/cliente/sagas';
-import colaborador from './modules/colaborador/sagas';
-import servico from './modules/servico/sagas';
-import horario from './modules/horario/sagas';
-
+import agendamentoSaga from './modules/agendamento/sagas';
+import clienteSaga from './modules/cliente/sagas';
+import servicoSaga from './modules/servico/sagas';
+import colaboradorSaga from './modules/colaborador/sagas';
+import horarioSaga from './modules/horario/sagas';
+import relatorioSaga from './modules/relatorio/sagas'; // Novo saga de relatórios
 
 export default function* rootSaga() {
-    return yield all ([agendamento, clientes, colaborador, servico, horario]);
+    yield all([
+        agendamentoSaga,
+        clienteSaga,
+        servicoSaga,
+        colaboradorSaga,
+        horarioSaga,
+        relatorioSaga, // Adicionando o novo saga
+    ]);
 }
