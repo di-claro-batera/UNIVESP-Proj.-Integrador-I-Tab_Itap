@@ -1,24 +1,31 @@
 const express = require('express');
-const app = express();
 const morgan = require('morgan');
 const busboy = require('connect-busboy');
 const busboyBodyParser = require('busboy-body-parser');
 const cors = require('cors');
 
-// DATABASE
+// Inicializar o Express
+const app = express();
+
+// Conectar ao banco de dados
 require('./database');
 
-//MIDDLEWARES
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(busboy());
-app.use(busboyBodyParser());
-app.use(cors());
+// Middlewares
+app.use(morgan('dev')); // Log de requisições
+app.use(express.json()); // Parsear JSON no corpo das requisições
+app.use(busboy()); // Para upload de arquivos
+app.use(busboyBodyParser()); // Parsear multipart/form-data
+app.use(cors({
+    origin: 'http://54.221.98.15', // Permitir apenas o frontend (IP da instância EC2)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+    credentials: true, // Permitir cookies e autenticação
+}));
 
-//VARIABLES
-app.set('port', 8000);
+// Variáveis
+const port = 8000; // Porta fixa
+const env = 'production'; // Ambiente fixo (produção)
 
-/* ROTAS */
+// Rotas
 app.use('/manicure', require('./src/routes/manicure.routes'));
 app.use('/cliente', require('./src/routes/cliente.routes'));
 app.use('/servico', require('./src/routes/servico.routes'));
@@ -27,7 +34,7 @@ app.use('/horario', require('./src/routes/horario.routes'));
 app.use('/agendamento', require('./src/routes/agendamento.routes'));
 app.use('/relatorios', require('./src/routes/relatorios.routes'));
 
-
-app.listen(app.get('port'), function () {
-  console.log('WS escutando porta ' + app.get('port'));
+// Iniciar o servidor
+app.listen(port, '0.0.0.0', () => {
+    console.log(`WS escutando na porta ${port} (${env})`);
 });
