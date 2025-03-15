@@ -3,6 +3,7 @@
     "@gorhom/bottom-sheet": "^5",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "deprecated-react-native-prop-types": "^5.0.0",
+    "mongoose": "^8.12.1",
     "react-native-gesture-handler": "^2.20.2",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-modal": "^13.0.1",

@@ -16,7 +16,7 @@ app.use(express.json()); // Parsear JSON no corpo das requisições
 app.use(busboy()); // Para upload de arquivos
 app.use(busboyBodyParser()); // Parsear multipart/form-data
 app.use(cors({
-    origin: 'http://34.204.0.12', // Permitir apenas o frontend (IP da instância EC2)
+    origin: 'http://34.204.0.12:3000', // Permitir apenas o frontend (IP da instância EC2)
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     credentials: true, // Permitir cookies e autenticação
 }));
