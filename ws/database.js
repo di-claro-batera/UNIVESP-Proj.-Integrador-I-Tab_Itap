@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
+require('dotenv').config(); // Carrega as variáveis de ambiente do .env
 
-const URI = 'mongodb+srv://diclarobatera:VQIf8WtvH8zqWtUn@cluster0.jnxjjwr.mongodb.net/Mary-Care-APP?retryWrites=true&w=majority&appName=Cluster0';
+const URI = process.env.DATABASE_URL; // Usa a variável de ambiente
 
-const env = process.env.NODE_ENV || 'dev';
+const env = process.env.NODE_ENV || 'development'; // Define o ambiente
 let options = {};
 
-//mongoose.set('useNewUrlParser', true);
-//mongoose.set('useFindAndModify', false);
-//mongoose.set('useCreateIndex', true);
-//mongoose.set('useUnifiedTopology', true);
+// Configurações do Mongoose (opcional)
+// mongoose.set('useNewUrlParser', true);
+// mongoose.set('useFindAndModify', false);
+// mongoose.set('useCreateIndex', true);
+// mongoose.set('useUnifiedTopology', true);
 
 mongoose
   .connect(URI, options)

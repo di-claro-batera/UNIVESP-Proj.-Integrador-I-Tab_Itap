@@ -40,6 +40,10 @@ const ModalAgendamento = () => {
     const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize();
     const snapPoints = useMemo(() => ['100%', '99%'], []);
 
+    // Logs para depuração
+    console.log('Serviço selecionado:', servicoValido);
+    console.log('Agendamento atual:', agendamento);
+
     // Define um colaborador padrão ao carregar a página
     useEffect(() => {
         if (colaboradores.length > 0 && !agendamento.colaboradorId) {
@@ -127,7 +131,11 @@ const ModalAgendamento = () => {
                             agendamento={agendamento}
                             onOpenEspecialistaModal={openEspecialistaModal}
                         />
-                        <PaymentPicker />
+                        {/* Passa as props corretamente para o PaymentPicker */}
+                        <PaymentPicker 
+                            agendamento={agendamento} // Passa o agendamento atual
+                            servico={servicoValido}   // Passa o serviço selecionado
+                        />
                         <Box hasPadding>
                             <LinearGradient
                                 colors={['#6750A4', '#B45BD9']}

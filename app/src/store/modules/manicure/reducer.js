@@ -10,8 +10,9 @@ const INITIAL_STATE = {
     servicos: [],
     agenda: [],
     colaboradores: [],
+    clientes: [], // Adicionando a lista de clientes ao estado inicial
     agendamento: {
-        clienteId: consts.clienteId,
+        clienteId: null,
         manicureId: consts.manicureId,
         servicoId: null, // Inicialmente null
         colaboradorId: null, // Inicialmente null
@@ -83,6 +84,33 @@ function manicure(state = INITIAL_STATE, action) {
                     draft.form.modalAgendamento = 1;
                 }
                 draft.agendamento = { ...state.agendamento, ...action.agendamento };
+
+                // Garantir que o serviço selecionado exista na lista de serviços
+                if (action.agendamento.servicoId) {
+                    const servicoExistente = draft.servicos.find(s => s._id === action.agendamento.servicoId);
+                    if (!servicoExistente) {
+                        draft.agendamento.servicoId = null; // Reseta se o serviço não existir
+                    }
+                }
+            });
+        }
+
+        case types.BUSCAR_CLIENTES_SUCCESS: {
+            return produce(state, draft => {
+                draft.clientes = action.payload; // Salva a lista de clientes no estado
+            });
+        }
+
+        case types.BUSCAR_CLIENTES_FAILURE: {
+            return produce(state, draft => {
+                draft.clientes = []; // Limpa a lista de clientes em caso de erro
+            });
+        }
+
+        case types.LOGIN_SUCCESS: {
+            return produce(state, draft => {
+                draft.agendamento.clienteId = action.payload._id; // Atualiza o clienteId com o ID do cliente logado
+                draft.clienteAtual = action.payload; // Salva os dados do cliente atual no estado
             });
         }
 

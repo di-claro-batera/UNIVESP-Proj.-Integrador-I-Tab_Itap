@@ -43,3 +43,21 @@ export function updateColaboradores(colaboradores) {
 export const closeModalAgendamento = () => ({
     type: types.CLOSE_MODAL_AGENDAMENTO,
 });
+
+export const buscarClientesRequest = () => ({
+    type: types.BUSCAR_CLIENTES_REQUEST,
+});
+
+export const buscarClientesSuccess = (clientes) => ({
+    type: types.BUSCAR_CLIENTES_SUCCESS,
+    payload: clientes,
+});
+
+export const buscarClientesFailure = () => ({
+    type: types.BUSCAR_CLIENTES_FAILURE,
+});
+
+export const handleLoginSuccess = (cliente) => ({
+    type: types.LOGIN_SUCCESS,
+    payload: cliente,
+});

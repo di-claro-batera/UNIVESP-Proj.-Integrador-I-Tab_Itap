@@ -3,9 +3,37 @@ import moment from 'moment';
 import api from '../../../services/api';
 import consts from '../../../consts';
 import util from '../../../util';
-import { updateAgenda, updateManicure, updateServicos, updateColaboradores, updateAgendamento, updateForm } from './actions';
+import { 
+    updateAgenda, 
+    updateManicure, 
+    updateServicos, 
+    updateColaboradores, 
+    updateAgendamento, 
+    updateForm, 
+    buscarClientesSuccess, 
+    buscarClientesFailure 
+} from './actions';
 import types from './types';
 
+// Saga para buscar os clientes
+export function* fetchClientes() {
+    try {
+        const { data: res } = yield call(api.get, `/cliente/manicure/${consts.manicureId}/`);
+
+        if (res.error) {
+            alert(res.message);
+            yield put(buscarClientesFailure());
+            return false;
+        }
+
+        yield put(buscarClientesSuccess(res.clientes)); // Despacha o sucesso com a lista de clientes
+    } catch (err) {
+        alert(err.message);
+        yield put(buscarClientesFailure());
+    }
+}
+
+// Saga para buscar os dados da manicure
 export function* getManicure() {
     try {
         const { data: res } = yield call(api.get, `/manicure/${consts.manicureId}`);
@@ -21,6 +49,7 @@ export function* getManicure() {
     }
 }
 
+// Saga para buscar todos os serviços
 export function* allServicos() {
     try {
         const { data: res } = yield call(api.get, `/servico/manicure/${consts.manicureId}`);
@@ -43,6 +72,7 @@ export function* allServicos() {
     }
 }
 
+// Saga para filtrar a agenda
 export function* filterAgenda() {
     try {
         const { agendamento } = yield select(state => state.manicure);
@@ -82,6 +112,7 @@ export function* filterAgenda() {
     }
 }
 
+// Saga para salvar o agendamento
 export function* saveAgendamento() {
     try {
         yield put(updateForm({ agendamentoLoading: true }));
@@ -102,9 +133,16 @@ export function* saveAgendamento() {
     }
 }
 
+// Watcher saga para buscar clientes
+export function* watchFetchClientes() {
+    yield takeLatest(types.BUSCAR_CLIENTES_REQUEST, fetchClientes);
+}
+
+// Combinando todos os sagas
 export default all([
     takeLatest(types.GET_MANICURE, getManicure),
     takeLatest(types.ALL_SERVICOS, allServicos),
     takeLatest(types.FILTER_AGENDA, filterAgenda),
     takeLatest(types.SAVE_AGENDAMENTO, saveAgendamento),
+    watchFetchClientes(), // Adiciona o watcher para buscar clientes
 ]);

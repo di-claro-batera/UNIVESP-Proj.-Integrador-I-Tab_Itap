@@ -57,5 +57,6 @@ dependencies {
         implementation jscFlavor
     }
     implementation 'androidx.multidex:multidex:2.0.1'
-    //implementation 'com.swmansion.gesturehandler:react-native-gesture-handler:2.20.2'
+    implementation project(':react-native-webview')
+    implementation project(':react-native-gesture-handler') // Adicione esta linha
 }
