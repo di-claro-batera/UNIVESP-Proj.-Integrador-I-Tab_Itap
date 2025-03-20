@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, Image, StyleSheet, Alert, Modal, TextInput, ScrollView, Clipboard, Linking } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { View, Image, StyleSheet, Alert, Modal, TextInput, ScrollView, Clipboard, Linking, TouchableOpacity } from 'react-native';
 import util from '../../util';
 import theme from '../../styles/theme.json';
-import { Box, Text, Touchable } from '../../styles';
+import { Box, Text, Touchable } from '../../styles'; // Touchable personalizado para os botões de pagamento
 import { useFontSize } from './FontSizeContext'; // Importando o contexto do tamanho da fonte
 import api from '../../services/api'; // Importando sua instância do axios
+import InAppBrowser from 'react-native-inappbrowser-reborn'; // Biblioteca para abrir links no navegador integrado
 
 // Importando a imagem do QR Code
 import qrCodeImage from '../../assets/images/codigoQR.jpg'; // Ajuste o caminho conforme necessário
@@ -14,8 +14,6 @@ import qrCodeImage from '../../assets/images/codigoQR.jpg'; // Ajuste o caminho 
 const PaymentPicker = ({ agendamento, servico }) => {
     const { fontScale } = useFontSize(); // Usando o contexto do tamanho da fonte
     const [loading, setLoading] = useState(false);
-    const [checkoutUrl, setCheckoutUrl] = useState(null); // URL do checkout
-    const [modalVisible, setModalVisible] = useState(false); // Controle do modal
     const [pixModalVisible, setPixModalVisible] = useState(false); // Controle do modal do PIX
 
     // Código PIX "copia e cola"
@@ -38,92 +36,85 @@ const PaymentPicker = ({ agendamento, servico }) => {
         });
     };
 
+    const handlePayment = async () => {
+        setLoading(true);
+      
+        try {
+          const accessToken = 'APP_USR-4664714789132333-031615-be4140c4538fb838b339cb45f89763d0-139857340';
+      
+          const preferenceData = {
+            items: [
+              {
+                title: servico.titulo,
+                quantity: 1,
+                currency_id: 'BRL',
+                unit_price: servico.preco,
+              },
+            ],
+            payer: {
+              email: 'cliente@example.com',
+            },
+          };
+      
+          const response = await api.post(
+            'https://api.mercadopago.com/checkout/preferences',
+            preferenceData,
+            {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+      
+          if (response.data && response.data.init_point) {
+            console.log('Checkout URL:', response.data.init_point); // Log para depuração
+      
+            // Verifica se o InAppBrowser está disponível
+            if (await InAppBrowser.isAvailable()) {
+              await InAppBrowser.open(response.data.init_point, {
+                dismissButtonStyle: 'close',
+                preferredBarTintColor: theme.colors.primary,
+                preferredControlTintColor: 'white',
+              });
+            } else {
+              // Se o InAppBrowser não estiver disponível, tenta abrir com Linking
+              const canOpen = await Linking.canOpenURL(response.data.init_point);
+              if (canOpen) {
+                await Linking.openURL(response.data.init_point);
+              } else {
+                Alert.alert('Erro', 'Não foi possível abrir o navegador.');
+              }
+            }
+          } else {
+            throw new Error('URL de checkout não retornada pela API do Mercado Pago.');
+          }
+        } catch (error) {
+          console.error('Erro ao criar preferência de pagamento:', error.response ? error.response.data : error.message);
+          Alert.alert('Erro', 'Erro ao processar o pagamento. Tente novamente.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
     // Verifica se o serviço e o agendamento estão definidos
     if (!servico || !agendamento) {
         return (
             <Box align="center" hasPadding>
-                <Text style={{ fontSize: 16 * fontScale }}>
+                <Text style={{ fontSize: 16 * fontScale, fontFamily: theme.fonts.regular.fontFamily }}>
                     Nenhum serviço selecionado.
                 </Text>
             </Box>
         );
     }
 
-    // Função para criar a preferência de pagamento
-    const handlePayment = async () => {
-        setLoading(true);
-
-        try {
-            // Access Token do MercadoPago
-            const accessToken = 'APP_USR-4664714789132333-031615-be4140c4538fb838b339cb45f89763d0-139857340';
-
-            // Dados da preferência de pagamento
-            const preferenceData = {
-                items: [
-                    {
-                        title: servico.titulo, // Nome do serviço dinâmico
-                        quantity: 1,
-                        currency_id: 'BRL', // Moeda (Real Brasileiro)
-                        unit_price: servico.preco, // Preço dinâmico
-                    },
-                ],
-                payer: {
-                    email: 'cliente@example.com', // E-mail fixo (substitua pelo necessário)
-                },
-            };
-
-            // Cria a preferência de pagamento
-            const response = await api.post(
-                'https://api.mercadopago.com/checkout/preferences',
-                preferenceData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-
-            // Verifica se a URL de checkout foi retornada corretamente
-            if (response.data && response.data.init_point) {
-                console.log('Checkout URL:', response.data.init_point); // Log para depuração
-                setCheckoutUrl(response.data.init_point);
-                setModalVisible(true);
-            } else {
-                throw new Error('URL de checkout não retornada pela API do Mercado Pago.');
-            }
-        } catch (error) {
-            console.error('Erro ao criar preferência de pagamento:', error.response ? error.response.data : error.message);
-            Alert.alert('Erro', 'Erro ao processar o pagamento. Tente novamente.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Função para capturar o resultado do pagamento
-    const handleWebViewNavigationStateChange = (navState) => {
-        const { url } = navState;
-
-        // Verifica se o pagamento foi concluído
-        if (url.includes('approved')) {
-            setModalVisible(false);
-            Alert.alert('Sucesso', 'Pagamento aprovado! Obrigado pela compra.');
-        } else if (url.includes('failure')) {
-            setModalVisible(false);
-            Alert.alert('Erro', 'Pagamento recusado. Tente novamente.');
-        } else if (url.includes('pending')) {
-            setModalVisible(false);
-            Alert.alert('Aviso', 'Pagamento pendente. Aguarde a confirmação.');
-        }
-    };
-
     return (
         <>
-            <Text bold hasPadding color="dark" style={{ fontSize: 16 * fontScale }}>
+            <Text bold hasPadding color="dark" style={{ fontSize: 16 * fontScale, fontFamily: theme.fonts.regular.fontFamily }}>
                 Qual a Forma de pagamento?
             </Text>
             <View style={styles.container}>
-                {/* Touchable para pagamento com cartão */}
+                {/* Touchable personalizado para pagamento com cartão */}
                 <Touchable 
                     style={styles.touchable} 
                     onPress={handlePayment} 
@@ -136,14 +127,14 @@ const PaymentPicker = ({ agendamento, servico }) => {
                             }}
                             style={styles.image}
                         />
-                        <Text small style={[styles.cardText, { fontSize: 14 * fontScale }]}>
+                        <Text small style={[styles.cardText, { fontSize: 14 * fontScale, fontFamily: theme.fonts.regular.fontFamily }]}>
                             Pagar com Cartão
                         </Text>
                     </Box>
                     <Icon name="chevron-right" color={theme.colors.muted} size={20} />
                 </Touchable>
 
-                {/* Touchable para pagamento com PIX */}
+                {/* Touchable personalizado para pagamento com PIX */}
                 <Touchable 
                     style={styles.touchable} 
                     onPress={() => setPixModalVisible(true)} 
@@ -156,75 +147,79 @@ const PaymentPicker = ({ agendamento, servico }) => {
                             }}
                             style={styles.image}
                         />
-                        <Text small style={[styles.cardText, { fontSize: 14 * fontScale }]}>
-                            Pagar com PIX
+                        <Text small style={[styles.cardText, { fontSize: 14 * fontScale, fontFamily: theme.fonts.regular.fontFamily }]}>
+                            Pagar com Pix
                         </Text>
                     </Box>
                     <Icon name="chevron-right" color={theme.colors.muted} size={20} />
                 </Touchable>
             </View>
 
-            {/* Modal com WebView para o checkout */}
-            <Modal
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-                animationType="slide"
-            >
-                {checkoutUrl && (
-                    <WebView
-                        source={{ uri: checkoutUrl }}
-                        onNavigationStateChange={handleWebViewNavigationStateChange}
-                        startInLoadingState={true}
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                    />
-                )}
-            </Modal>
-
             {/* Modal para pagamento com PIX */}
             <Modal
                 visible={pixModalVisible}
                 onRequestClose={() => setPixModalVisible(false)}
                 animationType="slide"
+                transparent={true}
             >
-                <ScrollView contentContainerStyle={styles.pixModalContainer}>
-                    <Text bold style={{ fontSize: 18 * fontScale, marginBottom: 20 }}>
-                        Pagamento via PIX
-                    </Text>
-                    <Image 
-                        source={qrCodeImage} // Usando a imagem local do QR Code
-                        style={styles.qrCode}
-                    />
-                    <Text style={{ fontSize: 14 * fontScale, marginTop: 20 }}>
-                        Ou copie o código abaixo:
-                    </Text>
-                    <TextInput
-                        style={styles.pixCodeInput}
-                        value={pixCode} // Usando o código PIX fornecido
-                        editable={false}
-                        multiline={true}
-                    />
-                    <Touchable 
-                        style={styles.copyButton} 
-                        onPress={copyPixCode} // Função para copiar o código PIX
-                    >
-                        <Text style={{ color: 'white', fontSize: 14 * fontScale }}>
-                            Copiar Código PIX
-                        </Text>
-                    </Touchable>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                            <Box hasPadding direction="column">
+                                <Text bold color="dark" style={[styles.modalTitle, { fontFamily: theme.fonts.bold.fontFamily }]}>
+                                    Pagamento via Pix
+                                </Text>
+                                <Text small style={[styles.modalSubtitle, { fontFamily: theme.fonts.regular.fontFamily }]}>
+                                    Escaneie o QR Code ou copie o código abaixo:
+                                </Text>
 
-                    {/* Mensagem para enviar comprovante */}
-                    <Text style={{ fontSize: 14 * fontScale, marginTop: 20, textAlign: 'center' }}>
-                        Por favor, envie o comprovante para o WhatsApp {' '}
-                        <Text 
-                            style={{ color: theme.colors.primary, fontWeight: 'bold' }} 
-                            onPress={openWhatsApp} // Abre o WhatsApp ao tocar no número
-                        >
-                            (16) 99775-1719
-                        </Text>
-                        {' '}para confirmar o pagamento.
-                    </Text>
-                </ScrollView>
+                                <Image 
+                                    source={qrCodeImage} // Usando a imagem local do QR Code
+                                    style={styles.qrCode}
+                                />
+
+                                {/* Campo de texto para exibir o código PIX */}
+                                <View style={styles.pixCodeContainer}>
+                                    <TextInput
+                                        style={[styles.pixCodeInput, { fontFamily: theme.fonts.regular.fontFamily }]}
+                                        value={pixCode} // Usando o código PIX fornecido
+                                        editable={false}
+                                        multiline={true}
+                                    />
+                                    <TouchableOpacity 
+                                        style={styles.copyIcon} 
+                                        onPress={copyPixCode} // Função para copiar o código PIX
+                                    >
+                                        <Icon name="content-copy" size={20} color={theme.colors.primary} />
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Botão para copiar o código PIX */}
+                                <TouchableOpacity 
+                                    style={styles.copyButton} 
+                                    onPress={copyPixCode} // Função para copiar o código PIX
+                                >
+                                    <Text bold color="light" style={{ fontFamily: theme.fonts.bold.fontFamily }}>
+                                        Copiar Código Pix
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <Text small style={[styles.whatsappText, { fontFamily: theme.fonts.regular.fontFamily }]}>
+                                    Por favor, envie o comprovante para o WhatsApp {' '}
+                                    <Text 
+                                        bold 
+                                        color="primary" 
+                                        onPress={openWhatsApp} // Abre o WhatsApp ao tocar no número
+                                        style={{ fontFamily: theme.fonts.bold.fontFamily }}
+                                    >
+                                        (16) 99775-1719
+                                    </Text>
+                                    {' '}para confirmar o pagamento.
+                                </Text>
+                            </Box>
+                        </ScrollView>
+                    </View>
+                </View>
             </Modal>
         </>
     );
@@ -235,16 +230,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     touchable: {
-        height: 35, // Ajustando altura para garantir visibilidade
+        height: 50, // Altura ajustada para melhor visualização
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 10,
-        backgroundColor: util.toAlpha(theme.colors.muted , 5),
+        backgroundColor: util.toAlpha(theme.colors.muted, 5),
         borderColor: util.toAlpha(theme.colors.muted, 40),
         borderWidth: 0.5,
         borderRadius: 5,
         marginVertical: 10,
+        width: '100%', // Garante que o botão ocupe a largura total
     },
     image: {
         width: 45, // Ajuste para visibilidade
@@ -252,40 +248,70 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     cardText: {
-        // Agora será ajustado dinamicamente
+        flex: 1, // Garante que o texto ocupe o espaço disponível
     },
     box: {
+        flexDirection: 'row',
+        alignItems: 'center',
         flex: 1, // Garantir que o Box ocupe o espaço disponível
-        justifyContent: 'flex-start', // Alinhamento à esquerda
     },
-    pixModalContainer: {
+    modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    modalContent: {
+        width: '90%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+    },
+    scrollViewContent: {
+        paddingVertical: 20,
+    },
+    modalTitle: {
+        fontSize: 22,
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    modalSubtitle: {
+        fontSize: 14,
+        marginBottom: 20,
+        textAlign: 'center',
     },
     qrCode: {
         width: 200,
         height: 200,
         marginBottom: 20,
+        alignSelf: 'center',
     },
-    pixCodeInput: {
-        width: '100%',
-        height: 100,
+    pixCodeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         padding: 10,
         marginTop: 10,
-        textAlign: 'center',
+    },
+    pixCodeInput: {
+        flex: 1,
         fontSize: 14,
     },
+    copyIcon: {
+        marginLeft: 10,
+    },
     copyButton: {
-        marginTop: 20,
+        width: '100%', // Ocupa a largura total do container
         backgroundColor: theme.colors.primary,
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
+        marginTop: 20,
+    },
+    whatsappText: {
+        marginTop: 20,
+        textAlign: 'center',
     },
 });
 

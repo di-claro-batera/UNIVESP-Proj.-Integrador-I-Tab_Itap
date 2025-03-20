@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
-import { buscarClientesRequest, handleLoginSuccess } from '../store/modules/manicure/actions'; // Importe a ação
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
+import { buscarClientesRequest, handleLoginSuccess } from '../store/modules/manicure/actions';
+import theme from '../styles/theme.json'; // Importe o tema
+import { Box } from '../styles'; // Importe o componente Box
 
 const LoginModal = ({ visible, onLoginSuccess }) => {
     const dispatch = useDispatch();
@@ -10,12 +12,11 @@ const LoginModal = ({ visible, onLoginSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const { clientes } = useSelector(state => state.manicure); // Acessa a lista de clientes no estado
+    const { clientes } = useSelector(state => state.manicure);
 
-    // Busca os clientes ao abrir a modal
     useEffect(() => {
         if (visible) {
-            dispatch(buscarClientesRequest()); // Despacha a ação para buscar clientes
+            dispatch(buscarClientesRequest());
         }
     }, [visible]);
 
@@ -29,15 +30,14 @@ const LoginModal = ({ visible, onLoginSuccess }) => {
         setError('');
 
         try {
-            // Filtra o cliente com base no nome e telefone
             const clienteEncontrado = clientes.find(cliente => 
                 cliente.nome.toLowerCase() === name.toLowerCase() && 
                 cliente.telefone === phone
             );
 
             if (clienteEncontrado) {
-                dispatch(handleLoginSuccess(clienteEncontrado)); // Despacha a ação de sucesso de login
-                onLoginSuccess(clienteEncontrado); // Chama a função de sucesso
+                dispatch(handleLoginSuccess(clienteEncontrado));
+                onLoginSuccess(clienteEncontrado);
             } else {
                 setError('Cliente não encontrado. Verifique os dados e tente novamente.');
             }
@@ -58,35 +58,52 @@ const LoginModal = ({ visible, onLoginSuccess }) => {
         >
             <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>Login</Text>
-                    <Text style={styles.modalSubtitle}>Informe seus dados para continuar</Text>
+                    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                        <View style={styles.container}>
+                            {/* Texto "Login" com o mesmo estilo de "Finalizar Agendamento" */}
+                            <Text style={styles.modalTitle}>Seja Bem Vindo!</Text>
+                            {/* Texto "Informe seus dados para continuar" com o mesmo estilo de "Escolha horário e método de pagamento" */}
+                            <Text style={styles.modalSubtitle}>Informe seus dados para continuar</Text>
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nome Completo"
-                        value={name}
-                        onChangeText={setName}
-                    />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nome Completo"
+                                placeholderTextColor="#666"
+                                value={name}
+                                onChangeText={setName}
+                                autoCapitalize="words"
+                                autoCorrect={false}
+                                keyboardType="default"
+                                color="#000"
+                                selectionColor={theme.colors.primary}
+                            />
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Telefone com DDD (XX)XXXX-XXXX"
-                        value={phone}
-                        onChangeText={setPhone}
-                        keyboardType="phone-pad"
-                    />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Telefone com DDD (XX)XXXX-XXXX"
+                                placeholderTextColor="#666"
+                                value={phone}
+                                onChangeText={setPhone}
+                                keyboardType="phone-pad"
+                                color="#000"
+                                selectionColor={theme.colors.primary}
+                            />
 
-                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                            {error ? (
+                                <Text style={styles.errorText}>{error}</Text>
+                            ) : null}
 
-                    <TouchableOpacity
-                        style={styles.loginButton}
-                        onPress={handleLogin}
-                        disabled={loading}
-                    >
-                        <Text style={styles.loginButtonText}>
-                            {loading ? 'Carregando...' : 'Entrar'}
-                        </Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={handleLogin}
+                                disabled={loading}
+                            >
+                                <Text style={styles.loginButtonText}>
+                                    {loading ? 'Carregando...' : 'Entrar'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
                 </View>
             </View>
         </Modal>
@@ -104,18 +121,26 @@ const styles = StyleSheet.create({
         width: '90%',
         backgroundColor: 'white',
         borderRadius: 10,
-        padding: 20,
-        alignItems: 'center',
+    },
+    scrollViewContent: {
+        paddingVertical: 20,
+    },
+    container: {
+        padding: 20, // Adicionei um padding para garantir espaçamento interno
     },
     modalTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 10,
+        color: theme.colors.dark, // Cor do tema
+        fontSize: 28, // Mesmo tamanho de "Finalizar Agendamento"
+        fontFamily: "Pattaya-Regular", // Mesma fonte de "Finalizar Agendamento"
+        textAlign: 'center', // Centralizado
+        marginBottom: 10, // Espaçamento inferior
     },
     modalSubtitle: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 20,
+        color: theme.colors.dark, // Cor do tema
+        fontSize: 18, // Mesmo tamanho de "Escolha horário e método de pagamento"
+        fontFamily: "PragatiNarrow-Regular", // Mesma fonte de "Escolha horário e método de pagamento"
+        textAlign: 'center', // Centralizado
+        marginBottom: 20, // Espaçamento inferior
     },
     input: {
         width: '100%',
@@ -125,10 +150,13 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         marginBottom: 15,
+        backgroundColor: '#fff',
+        color: '#000',
+        fontSize: 16,
     },
     loginButton: {
         width: '100%',
-        backgroundColor: '#007bff',
+        backgroundColor: theme.colors.primary,
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
@@ -138,7 +166,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     errorText: {
-        color: 'red',
+        color: theme.colors.danger,
         fontSize: 14,
         marginBottom: 10,
     },

@@ -59,12 +59,21 @@ const HomeContent = () => {
             {/* Conteúdo da tela inicial */}
             {isLoggedIn ? (
                 <FlatList
-                    style={{ backgroundColor: util.toAlpha(theme.colors.muted, 10) }}
-                    ListHeaderComponent={<Header />}
-                    data={finalServicos}
-                    renderItem={({ item }) => (<Servico servico={item} />)}
-                    keyExtractor={(item) => item._id}
-                />
+                contentContainerStyle={{
+                    paddingTop: 0, // Remove o espaço acima da lista
+                    paddingBottom: 0, // Remove o espaço abaixo da lista
+                    margin: 0, // Remove margens gerais
+                }}
+                style={{
+                    backgroundColor: util.toAlpha(theme.colors.muted, 10),
+                    margin: 0, // Garante que o FlatList não tenha margem
+                }}
+                ListHeaderComponent={<Header />}
+                data={finalServicos}
+                renderItem={({ item }) => (<Servico servico={item} />)}
+                keyExtractor={(item) => item._id}
+            />
+            
             ) : null}
 
             {/* Modal de agendamento */}

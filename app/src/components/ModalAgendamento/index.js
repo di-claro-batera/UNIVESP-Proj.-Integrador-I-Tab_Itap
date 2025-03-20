@@ -83,7 +83,7 @@ const ModalAgendamento = () => {
     }, []);
 
     return (
-        <GestureHandlerRootView style={[styles.container, { paddingTop: isExpanded ? 810 : 100 }]}>
+        <GestureHandlerRootView style={[styles.container, { paddingTop: isExpanded ? 800 : 95 }]}>
             <BottomSheet
                 ref={sheetRef}
                 index={0}
@@ -171,6 +171,9 @@ const ModalAgendamento = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#fff', // Exemplo de fundo para teste
+        paddingTop: 0, // Certifique-se de que o padrão seja zero
+        margin: 0, // Garante que não há margens adicionais
     },
     bottomSheetBackground: {
         backgroundColor: 'transparent',
@@ -193,14 +196,14 @@ const styles = StyleSheet.create({
     headerContainer: {
         width: '100%',
         height: 70,
-        backgroundColor: 'rgba(255, 255, 255, 0.0)',
+        backgroundColor: 'rgb(255, 255, 255)',
     },
     gradientView: {
         flex: 1,
         padding: 15,
         borderRadius: 10,
         justifyContent: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.0)',
+        backgroundColor: 'rgb(255, 255, 255)',
     },
     headerContent: {
         flexDirection: 'row',

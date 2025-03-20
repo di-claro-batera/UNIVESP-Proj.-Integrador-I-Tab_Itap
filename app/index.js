@@ -23,19 +23,18 @@ const App = () => {
     <GestureHandlerRootView style={AppStyles.mainContainer}>
       <StoreProvider store={store}>
         <PaperProvider theme={theme}>
-          <View style={AppStyles.mainContainer}> 
-            <Home />
-          </View>
+          <Home />
         </PaperProvider>
       </StoreProvider>
     </GestureHandlerRootView>
   );
 };
 
+
 const AppStyles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.0)', // Configuração de fundo transparente
+    backgroundColor: '#fff', // Configuração de fundo transparente
   },
 });
 

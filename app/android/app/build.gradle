@@ -58,5 +58,6 @@ dependencies {
     }
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation project(':react-native-webview')
-    implementation project(':react-native-gesture-handler') // Adicione esta linha
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-reanimated') 
 }

@@ -31,14 +31,14 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: '100%',
     height: 90,
-    backgroundColor: 'rgba(255, 255, 255, 0.0)', // Define como transparente
+    backgroundColor: 'rgb(255, 255, 255)', // Define como transparente
   },
   gradientView: {
     flex: 1,
     padding: 20,
     borderRadius: 1,
     justifyContent: 'center', // Centralize o conteúdo verticalmente
-    backgroundColor: 'rgba(255, 255, 255, 0.0)', // Define como transparente
+    backgroundColor: 'rgb(255, 255, 255)', // Define como transparente
   },
   headerContent: {
     flex: 1,

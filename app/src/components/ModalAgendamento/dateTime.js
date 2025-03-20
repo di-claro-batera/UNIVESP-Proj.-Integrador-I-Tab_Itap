@@ -7,7 +7,7 @@ import { updateAgendamento } from '../../store/modules/manicure/actions';
 import moment from 'moment/min/moment-with-locales';
 moment.locale('pt-br');
 import { useFontSize } from './FontSizeContext';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const DateTime = ({
     servico,
@@ -18,8 +18,10 @@ const DateTime = ({
 }) => {
     const dispatch = useDispatch();
     const { fontScale } = useFontSize();
+    const { agendamento } = useSelector(state => state.manicure);
 
     const [diasDisponiveis, setDiasDisponiveis] = useState(agenda);
+    const [horaLocalSelecionada, setHoraLocalSelecionada] = useState(horaSelecionada); // Estado para o horário local
 
     const verificarDiaDisponivel = (dia) => {
         const hoje = moment().format('YYYY-MM-DD');
@@ -56,7 +58,15 @@ const DateTime = ({
             return;
         }
 
-        let data = !isTime ? `${value}T${horariosDisponiveis[0][0]}` : `${dataSelecionada}T${value}`;
+        // Se for um horário, converte o horário local (UTC-3) para UTC antes de enviar
+        let horarioUTC = value;
+        if (isTime) {
+            horarioUTC = moment(value, 'HH:mm').utc().format('HH:mm'); // Converte para UTC
+            setHoraLocalSelecionada(value); // Atualiza o estado do horário local
+        }
+
+        // Monta a data no formato esperado pelo banco de dados (UTC)
+        let data = !isTime ? `${value}T${horariosDisponiveis[0][0]}` : `${dataSelecionada}T${horarioUTC}`;
         dispatch(updateAgendamento({ data }));
     };
 
@@ -114,10 +124,13 @@ const DateTime = ({
                 renderItem={({ item }) => (
                     <Box direction="column" spacing="0 10px 0 0">
                         {item.map((horario) => {
-                            const selected = horario === horaSelecionada;
+                            // Exibe o horário em UTC-3 (fuso horário local)
+                            const horarioLocal = moment.utc(horario, 'HH:mm').utcOffset(-3).format('HH:mm');
+                            const selected = horarioLocal === horaLocalSelecionada; // Compara com o horário local
+
                             return (
                                 <Touchable
-                                    key={`${dataSelecionada}-${horario}`} // Chave única para cada horário
+                                    key={`${dataSelecionada}-${horarioLocal}`} // Chave única para cada horário
                                     width="100px"
                                     height="35px"
                                     spacing="0 0 5px 0"
@@ -126,10 +139,10 @@ const DateTime = ({
                                     justify="center"
                                     align="center"
                                     border={`1px solid ${selected ? theme.colors.primary : util.toAlpha(theme.colors.muted, 100)}`}
-                                    onPress={() => setAgendamento(horario, true)}
+                                    onPress={() => setAgendamento(horarioLocal, true)}
                                 >
                                     <Text color={selected ? "light" : undefined} style={{ fontSize: 14 * fontScale }}>
-                                        {horario}
+                                        {horarioLocal}
                                     </Text>
                                 </Touchable>
                             );

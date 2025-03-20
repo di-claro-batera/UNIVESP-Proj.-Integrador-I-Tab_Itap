@@ -4,36 +4,41 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import theme from '../../styles/theme.json';
 import { Linking, View, Share } from 'react-native';
 import { ScaledSheet, moderateScale } from 'react-native-size-matters';
-import { useFontSize } from '../../components/ModalAgendamento/FontSizeContext'; // Importando o contexto do tamanho da fonte
+import { useFontSize } from '../../components/ModalAgendamento/FontSizeContext';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateForm } from '../../store/modules/manicure/actions';
 
 const Header = () => {
-
     const dispatch = useDispatch();
-
-    const {manicure, servicos} = useSelector(state => state.manicure);
-
-    const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize(); // Usando o contexto de tamanho de fonte
+    const { manicure, servicos } = useSelector(state => state.manicure);
+    const { fontScale, increaseFontSize, decreaseFontSize } = useFontSize();
 
     const openGoogleMaps = () => {
         const url = 'https://www.google.com/maps/search/?api=1&query=-21.732531,-48.686678';
-        Linking.openURL(url).catch(error => {
-            console.error('An error occurred', error);
-        });
+        Linking.openURL(url).catch(error => console.error('An error occurred', error));
     };
 
     const handleShareOnWhatsApp = () => {
-            const message = 'Olá, estou compartilhando o Mari Care com você!'; // Mensagem que será enviada
-            const url = `whatsapp://send?text=${encodeURIComponent(message)}`; // Cria a URL do WhatsApp
+        const phoneNumber = '(16) 99775-1719'; // Número formatado para exibição
+        const message = `Olá, aqui está o contato da Mari Care: ${phoneNumber}`;
     
-            Linking.openURL(url).catch(() => {
-                alert('O WhatsApp não está instalado no seu dispositivo.'); // Trata o caso em que o WhatsApp não está instalado
-            });
-        };
+        Share.share({
+            message: message, // Mensagem que será compartilhada
+        })
+        .then((result) => {
+            if (result.action === Share.sharedAction) {
+                console.log('Compartilhado com sucesso!');
+            } else if (result.action === Share.dismissedAction) {
+                console.log('Compartilhamento cancelado.');
+            }
+        })
+        .catch((error) => {
+            console.error('Erro ao compartilhar:', error);
+        });
+    };
 
     return (
-        <>
+        <View style={{ marginBottom: 0, paddingBottom: 0 }}> 
             <Cover
                 image="https://s28461.pcdn.co/wp-content/uploads/2015/12/Manicure-con-gel_-duradero-pero-problema%CC%81tico-para-la-salud.jpg"
                 width="100%"
@@ -119,19 +124,19 @@ const Header = () => {
                     accessibilityHint="Digite o nome do serviço que está procurando"
                 />
             </Box>
-        </>
+        </View>
     );
 };
 
 const styles = (fontScale) => ScaledSheet.create({
     title: {
-        fontSize: moderateScale(36 * fontScale), // Usando moderateScale para garantir valores numéricos
+        fontSize: moderateScale(36 * fontScale),
     },
     text: {
-        fontSize: moderateScale(15 * fontScale), // Usando moderateScale para garantir valores numéricos
+        fontSize: moderateScale(15 * fontScale),
     },
     titleSmall: {
-        fontSize: moderateScale(20 * fontScale), // Usando moderateScale para garantir valores numéricos
+        fontSize: moderateScale(20 * fontScale),
     },
     fontButtonsContainer: {
         position: 'absolute',
@@ -140,18 +145,18 @@ const styles = (fontScale) => ScaledSheet.create({
         alignItems: 'center',
     },
     circleButton: {
-        width: 40, // Dimensão ajustada para ser menor
-        height: 40, // Dimensão ajustada para ser menor
-        borderRadius: 20, // Para formar um círculo
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         backgroundColor: theme.colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: 10,
-        overflow: 'hidden', // Garantir que qualquer conteúdo extra seja cortado
+        overflow: 'hidden',
     },
     buttonText: {
         color: '#fff',
-        fontSize: 12, // Tamanho da fonte ajustado para caber no botão
+        fontSize: 12,
     },
 });
 

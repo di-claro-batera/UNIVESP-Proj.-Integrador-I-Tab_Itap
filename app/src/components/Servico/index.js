@@ -17,14 +17,12 @@ const Servico = ({ servico }) => {
     const isServicoSelected = agendamento.servicoId === servico._id;
 
     const duracaoEmMinutos = servico.duracao;
-    console.log("Duração do serviço (minutos):", duracaoEmMinutos); // Depuração
 
     const horas = Math.floor(duracaoEmMinutos / 60);
     const minutos = duracaoEmMinutos % 60;
     const duracaoCorrigida = minutos === 0 ? `${horas}h` : `${horas}h ${minutos}m`;
 
     const handleSelectServico = () => {
-        console.log("Servico selecionado:", servico._id); // Depuração
         console.log("Agendamento atual:", agendamento); // Depuração
 
         if (isServicoSelected) {
@@ -43,6 +41,10 @@ const Servico = ({ servico }) => {
             background="light"
             align="center"
             hasPadding
+            style={{
+                margin: 0, // Remove margem ao redor
+                padding: 0, // Remove padding interno
+            }}
             onPress={handleSelectServico}
         >
             <Cover 
